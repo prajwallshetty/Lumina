@@ -1,0 +1,890 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Lumina — Prisma schema
+// PostgreSQL · normalized · CMS-driven. All media are Cloudinary references;
+// single-slot images use embedded scalar fields, collections use join tables
+// that relate to the central Media library.
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// AUTH & RBAC  (Better Auth compatible core: User / Session / Account / Verification)
+// ═════════════════════════════════════════════════════════════════════════════
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  CONTENT_EDITOR
+  DESIGNER
+  SALES
+  VIEWER
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          UserRole  @default(VIEWER)
+  jobTitle      String?
+  phone         String?
+  bio           String?   @db.Text
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions          Session[]
+  accounts          Account[]
+  authoredPosts     BlogPost[]     @relation("PostAuthor")
+  assignedInquiries Inquiry[]      @relation("InquiryAssignee")
+  assignedBookings  Booking[]      @relation("BookingDesigner")
+  designedProjects  Project[]      @relation("ProjectDesigner")
+  auditLogs         AuditLog[]
+  uploadedMedia     Media[]        @relation("MediaUploader")
+
+  @@index([role])
+  @@index([email])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verifications")
+}
+
+// Editable permissions matrix (RBAC). `UserRole` enum drives code-level checks;
+// these rows let the Super Admin toggle capabilities per role in the CMS.
+model Permission {
+  id          String           @id @default(cuid())
+  key         String           @unique // e.g. "portfolio.update"
+  label       String
+  description String?
+  group       String // e.g. "Portfolio"
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now())
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  role         UserRole
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  allowed      Boolean    @default(false)
+
+  @@unique([role, permissionId])
+  @@index([role])
+  @@map("role_permissions")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String // e.g. "project.create"
+  entityType String? // e.g. "Project"
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// MEDIA LIBRARY  (Cloudinary)
+// ═════════════════════════════════════════════════════════════════════════════
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
+model MediaFolder {
+  id       String        @id @default(cuid())
+  name     String
+  slug     String        @unique
+  parentId String?
+  parent   MediaFolder?  @relation("FolderTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children MediaFolder[] @relation("FolderTree")
+  media    Media[]
+  createdAt DateTime     @default(now())
+
+  @@map("media_folders")
+}
+
+model Media {
+  id         String       @id @default(cuid())
+  publicId   String       @unique // Cloudinary public_id
+  url        String
+  secureUrl  String
+  type       MediaType    @default(IMAGE)
+  format     String?
+  width      Int?
+  height     Int?
+  bytes      Int?
+  duration   Float? // video length (s)
+  alt        String?
+  caption    String?
+  folderId   String?
+  folder     MediaFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  uploadedById String?
+  uploadedBy   User?      @relation("MediaUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt  DateTime     @default(now())
+
+  projectImages   ProjectImage[]
+  galleryItems    GalleryItem[]
+
+  @@index([folderId])
+  @@index([type])
+  @@map("media")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SITE SETTINGS  (singleton)  ·  Footer · Navigation · SEO defaults · Maintenance
+// ═════════════════════════════════════════════════════════════════════════════
+
+model SiteSettings {
+  id           String  @id @default("singleton")
+  // Company
+  companyName  String  @default("Lumina")
+  tagline      String?
+  description  String? @db.Text
+  email        String?
+  phone        String?
+  whatsapp     String?
+  addressLine  String?
+  city         String?
+  mapEmbedUrl  String?
+  // Brand assets (Cloudinary slots — empty until uploaded)
+  logoUrl        String?
+  logoPublicId   String?
+  logoDarkUrl    String?
+  faviconUrl     String?
+  faviconPublicId String?
+  ogImageUrl     String?
+  // Theme / design tokens (overridable in CMS)
+  primaryColor   String  @default("#1c1917")
+  accentColor    String  @default("#b08d57")
+  fontHeading    String  @default("Fraunces")
+  fontBody       String  @default("Inter")
+  // Integrations
+  googleAnalyticsId String?
+  metaPixelId       String?
+  smtpHost      String?
+  smtpPort      Int?
+  smtpUser      String?
+  smtpFrom      String?
+  // Default SEO
+  defaultMetaTitle       String?
+  defaultMetaDescription String? @db.Text
+  // Maintenance mode
+  maintenanceMode      Boolean   @default(false)
+  maintenanceMessage   String?   @db.Text
+  maintenanceEndsAt    DateTime?
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model SocialLink {
+  id       String  @id @default(cuid())
+  platform String // instagram, facebook, linkedin, youtube, pinterest, x
+  url      String
+  order    Int     @default(0)
+  isActive Boolean @default(true)
+
+  @@map("social_links")
+}
+
+enum NavLocation {
+  HEADER
+  FOOTER
+}
+
+model NavItem {
+  id        String      @id @default(cuid())
+  label     String
+  href      String
+  location  NavLocation @default(HEADER)
+  group     String? // footer column heading
+  parentId  String?
+  parent    NavItem?    @relation("NavTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  NavItem[]   @relation("NavTree")
+  order     Int         @default(0)
+  isActive  Boolean     @default(true)
+
+  @@index([location])
+  @@map("nav_items")
+}
+
+// Per-path SEO overrides (Meta / OG / Twitter / canonical / robots / schema)
+model SeoMeta {
+  id             String   @id @default(cuid())
+  path           String   @unique // e.g. "/about"
+  title          String?
+  description    String?  @db.Text
+  canonical      String?
+  ogTitle        String?
+  ogDescription  String?  @db.Text
+  ogImageUrl     String?
+  twitterCard    String?  @default("summary_large_image")
+  robots         String?  @default("index,follow")
+  structuredData Json?
+  updatedAt      DateTime @updatedAt
+
+  @@map("seo_meta")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HOMEPAGE CMS  (singleton with structured fields; sections toggle-able)
+// ═════════════════════════════════════════════════════════════════════════════
+
+model HomepageContent {
+  id                String  @id @default("singleton")
+  heroEyebrow       String?
+  heroTitle         String?
+  heroSubtitle      String? @db.Text
+  heroPrimaryCtaLabel String?
+  heroPrimaryCtaHref  String?
+  heroSecondaryCtaLabel String?
+  heroSecondaryCtaHref  String?
+  // Hero media slot (empty until uploaded)
+  heroMediaUrl      String?
+  heroMediaPublicId String?
+  heroMediaType     MediaType @default(IMAGE)
+  // Section visibility flags
+  showStats         Boolean @default(true)
+  showAboutPreview  Boolean @default(true)
+  showServices      Boolean @default(true)
+  showProcess       Boolean @default(true)
+  showFeatured      Boolean @default(true)
+  showBeforeAfter   Boolean @default(true)
+  showTestimonials  Boolean @default(true)
+  showReviews       Boolean @default(true)
+  showBrands        Boolean @default(true)
+  showBlog          Boolean @default(true)
+  showFaqs          Boolean @default(true)
+  updatedAt         DateTime @updatedAt
+
+  stats Stat[]
+
+  @@map("homepage_content")
+}
+
+model Stat {
+  id         String           @id @default(cuid())
+  label      String
+  value      String // "500+", "12 yrs"
+  order      Int              @default(0)
+  homepageId String?
+  homepage   HomepageContent? @relation(fields: [homepageId], references: [id], onDelete: Cascade)
+
+  @@map("stats")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ABOUT CMS
+// ═════════════════════════════════════════════════════════════════════════════
+
+model AboutContent {
+  id           String  @id @default("singleton")
+  storyTitle   String?
+  storyBody    String? @db.Text
+  mission      String? @db.Text
+  vision       String? @db.Text
+  // Founder slot
+  founderName    String?
+  founderRole    String?
+  founderMessage String? @db.Text
+  founderPhotoUrl      String?
+  founderPhotoPublicId String?
+  // Office slot
+  officePhotoUrl      String?
+  officePhotoPublicId String?
+  updatedAt DateTime @updatedAt
+
+  @@map("about_content")
+}
+
+model TimelineEvent {
+  id        String  @id @default(cuid())
+  year      String
+  title     String
+  body      String? @db.Text
+  order     Int     @default(0)
+
+  @@map("timeline_events")
+}
+
+model TeamMember {
+  id         String  @id @default(cuid())
+  name       String
+  role       String
+  bio        String? @db.Text
+  photoUrl      String?
+  photoPublicId String?
+  linkedinUrl String?
+  order      Int     @default(0)
+  isActive   Boolean @default(true)
+
+  @@map("team_members")
+}
+
+model Certificate {
+  id        String  @id @default(cuid())
+  title     String
+  issuer    String?
+  year      String?
+  imageUrl      String?
+  imagePublicId String?
+  order     Int     @default(0)
+
+  @@map("certificates")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SERVICES CMS  (each service = own page, CMS-driven; benefits/process/faqs)
+// ═════════════════════════════════════════════════════════════════════════════
+
+model Service {
+  id          String  @id @default(cuid())
+  title       String
+  slug        String  @unique
+  excerpt     String? @db.Text
+  overview    String? @db.Text
+  icon        String? // lucide icon name
+  heroMediaUrl      String?
+  heroMediaPublicId String?
+  isFeatured  Boolean @default(false)
+  isPublished Boolean @default(true)
+  order       Int     @default(0)
+  // SEO
+  metaTitle       String?
+  metaDescription String? @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  benefits    ServiceBenefit[]
+  processSteps ServiceProcessStep[]
+  faqs        Faq[]
+
+  @@index([slug])
+  @@index([isPublished])
+  @@map("services")
+}
+
+model ServiceBenefit {
+  id        String  @id @default(cuid())
+  title     String
+  body      String? @db.Text
+  icon      String?
+  order     Int     @default(0)
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([serviceId])
+  @@map("service_benefits")
+}
+
+model ServiceProcessStep {
+  id        String  @id @default(cuid())
+  step      Int
+  title     String
+  body      String? @db.Text
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([serviceId])
+  @@map("service_process_steps")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// PORTFOLIO CMS  (projects · gallery · before/after · materials)
+// ═════════════════════════════════════════════════════════════════════════════
+
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model ProjectCategory {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  order    Int       @default(0)
+  projects Project[]
+
+  @@map("project_categories")
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  summary     String?       @db.Text
+  description String?       @db.Text
+  categoryId  String?
+  category    ProjectCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  client      String?
+  location    String?
+  budget      String?
+  timeline    String?
+  area        String? // e.g. "2,400 sq ft"
+  year        String?
+  status      ProjectStatus @default(DRAFT)
+  isFeatured  Boolean       @default(false)
+  // Cover slot
+  coverMediaUrl      String?
+  coverMediaPublicId String?
+  // Video slot
+  videoUrl      String?
+  videoPublicId String?
+  // Designer
+  designerId  String?
+  designer    User?         @relation("ProjectDesigner", fields: [designerId], references: [id], onDelete: SetNull)
+  // Tags for filtering (Minimal / Industrial / Luxury / etc.)
+  tags        String[]      @default([])
+  // SEO
+  metaTitle       String?
+  metaDescription String? @db.Text
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  images      ProjectImage[]
+  materials   ProjectMaterial[]
+  beforeAfters BeforeAfter[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([categoryId])
+  @@map("projects")
+}
+
+model ProjectImage {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  mediaId   String?
+  media     Media?  @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  // Denormalized slot fields for direct upload without library entry
+  url       String?
+  publicId  String?
+  alt       String?
+  order     Int     @default(0)
+
+  @@index([projectId])
+  @@map("project_images")
+}
+
+model ProjectMaterial {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  detail    String?
+
+  @@index([projectId])
+  @@map("project_materials")
+}
+
+model BeforeAfter {
+  id        String  @id @default(cuid())
+  title     String
+  caption   String? @db.Text
+  beforeUrl      String?
+  beforePublicId String?
+  afterUrl       String?
+  afterPublicId  String?
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  isFeatured Boolean @default(false)
+  order     Int     @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+  @@map("before_afters")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// GALLERY CMS
+// ═════════════════════════════════════════════════════════════════════════════
+
+model GalleryItem {
+  id        String    @id @default(cuid())
+  title     String?
+  category  String?
+  mediaId   String?
+  media     Media?    @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  url       String?
+  publicId  String?
+  type      MediaType @default(IMAGE)
+  order     Int       @default(0)
+  isActive  Boolean   @default(true)
+
+  @@map("gallery_items")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// TESTIMONIALS CMS
+// ═════════════════════════════════════════════════════════════════════════════
+
+model Testimonial {
+  id          String  @id @default(cuid())
+  clientName  String
+  company     String?
+  location    String?
+  rating      Int     @default(5)
+  quote       String  @db.Text
+  photoUrl      String?
+  photoPublicId String?
+  videoUrl      String?
+  videoPublicId String?
+  isFeatured  Boolean @default(false)
+  isPublished Boolean @default(true)
+  order       Int     @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([isPublished])
+  @@map("testimonials")
+}
+
+// External review pointer (e.g. Google Reviews aggregate) — display only
+model Review {
+  id         String  @id @default(cuid())
+  author     String
+  rating     Int     @default(5)
+  body       String  @db.Text
+  source     String  @default("google")
+  sourceUrl  String?
+  reviewedAt DateTime?
+  isPublished Boolean @default(true)
+
+  @@map("reviews")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BRANDS  (logo slots)
+// ═════════════════════════════════════════════════════════════════════════════
+
+model Brand {
+  id        String  @id @default(cuid())
+  name      String
+  websiteUrl String?
+  logoUrl      String?
+  logoPublicId String?
+  order     Int     @default(0)
+  isActive  Boolean @default(true)
+
+  @@map("brands")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BLOG CMS
+// ═════════════════════════════════════════════════════════════════════════════
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+}
+
+model BlogCategory {
+  id    String     @id @default(cuid())
+  name  String     @unique
+  slug  String     @unique
+  posts BlogPost[]
+
+  @@map("blog_categories")
+}
+
+model BlogTag {
+  id    String        @id @default(cuid())
+  name  String        @unique
+  slug  String        @unique
+  posts BlogPostTag[]
+
+  @@map("blog_tags")
+}
+
+model BlogPost {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  excerpt     String?       @db.Text
+  content     String?       @db.Text // rich text (HTML/JSON from editor)
+  coverUrl      String?
+  coverPublicId String?
+  status      PostStatus    @default(DRAFT)
+  publishedAt DateTime?
+  readingTime Int? // minutes
+  categoryId  String?
+  category    BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  authorId    String?
+  author      User?         @relation("PostAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  tags        BlogPostTag[]
+  // SEO
+  metaTitle       String?
+  metaDescription String? @db.Text
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@map("blog_posts")
+}
+
+model BlogPostTag {
+  postId String
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tagId  String
+  tag    BlogTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("blog_post_tags")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// FAQ CMS  (global + per-service via optional serviceId)
+// ═════════════════════════════════════════════════════════════════════════════
+
+model FaqCategory {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  order Int    @default(0)
+  faqs  Faq[]
+
+  @@map("faq_categories")
+}
+
+model Faq {
+  id         String       @id @default(cuid())
+  question   String
+  answer     String       @db.Text
+  categoryId String?
+  category   FaqCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  serviceId  String?
+  service    Service?     @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  order      Int          @default(0)
+  isPublished Boolean     @default(true)
+
+  @@index([categoryId])
+  @@index([serviceId])
+  @@map("faqs")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// CAREERS
+// ═════════════════════════════════════════════════════════════════════════════
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+}
+
+model JobPosting {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  department  String?
+  location    String?
+  type        JobType   @default(FULL_TIME)
+  description String?   @db.Text
+  requirements String?  @db.Text
+  isOpen      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  applications JobApplication[]
+
+  @@index([slug])
+  @@map("job_postings")
+}
+
+model JobApplication {
+  id         String     @id @default(cuid())
+  jobId      String
+  job        JobPosting @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  name       String
+  email      String
+  phone      String?
+  resumeUrl      String? // Cloudinary document
+  resumePublicId String?
+  message    String?    @db.Text
+  createdAt  DateTime   @default(now())
+
+  @@index([jobId])
+  @@map("job_applications")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INQUIRIES  (every form submission)
+// ═════════════════════════════════════════════════════════════════════════════
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  WON
+  LOST
+}
+
+enum InquirySource {
+  CONTACT_FORM
+  CONSULTATION
+  SERVICE_PAGE
+  PROJECT_PAGE
+  FOOTER
+  OTHER
+}
+
+model Inquiry {
+  id         String        @id @default(cuid())
+  name       String
+  email      String?
+  phone      String?
+  service    String?
+  budget     String?
+  message    String?       @db.Text
+  status     InquiryStatus @default(NEW)
+  source     InquirySource @default(CONTACT_FORM)
+  assignedToId String?
+  assignedTo   User?       @relation("InquiryAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  notes InquiryNote[]
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([createdAt])
+  @@map("inquiries")
+}
+
+model InquiryNote {
+  id        String  @id @default(cuid())
+  inquiryId String
+  inquiry   Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  authorId  String?
+  body      String  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([inquiryId])
+  @@map("inquiry_notes")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BOOKINGS  (appointments / consultations)
+// ═════════════════════════════════════════════════════════════════════════════
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  service     String?
+  message     String?       @db.Text
+  scheduledAt DateTime
+  durationMin Int           @default(60)
+  status      BookingStatus @default(PENDING)
+  designerId  String?
+  designer    User?         @relation("BookingDesigner", fields: [designerId], references: [id], onDelete: SetNull)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([designerId])
+  @@map("bookings")
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// GENERIC PAGES  (Privacy, Terms, and other rich-text legal/static pages)
+// ═════════════════════════════════════════════════════════════════════════════
+
+model Page {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String?  @db.Text
+  isPublished Boolean  @default(true)
+  metaTitle       String?
+  metaDescription String? @db.Text
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@map("pages")
+}
