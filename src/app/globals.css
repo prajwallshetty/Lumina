@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 
 /* ───────────────────────────────────────────────────────────────────────────
-   Lumina Design System — Tailwind v4 (CSS-first)
+   Lumina Spaces — Editorial Design System (Tailwind v4 CSS-first)
    Warm, editorial luxury palette. Stone neutrals + brass accent.
    Dark mode via `.dark` class (next-themes).
    ─────────────────────────────────────────────────────────────────────────── */
@@ -10,41 +10,57 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Brand */
-  --brand: 27 32% 52%; /* brass / #b08d57-ish in HSL */
+  /* ── Brand / Material Design inspired tokens ── */
+  --brand: 27 32% 52%;
   --brand-foreground: 40 30% 96%;
 
-  /* Surfaces (light) */
+  /* Surfaces (light) — warm stone palette */
   --background: 40 20% 98%;
-  --foreground: 24 10% 10%;
+  --foreground: 120 7% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 24 10% 10%;
+  --card-foreground: 120 7% 11%;
   --popover: 0 0% 100%;
-  --popover-foreground: 24 10% 10%;
-  --primary: 24 10% 12%;
-  --primary-foreground: 40 30% 97%;
-  --secondary: 30 15% 94%;
-  --secondary-foreground: 24 10% 18%;
-  --muted: 30 12% 94%;
-  --muted-foreground: 25 6% 45%;
+  --popover-foreground: 120 7% 11%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 27 28% 54%;
+  --secondary-foreground: 0 0% 100%;
+  --secondary-container: 27 72% 87%;
+  --muted: 40 8% 93%;
+  --muted-foreground: 195 4% 46%;
   --accent: 27 32% 52%;
   --accent-foreground: 40 30% 97%;
   --destructive: 0 72% 46%;
   --destructive-foreground: 0 0% 98%;
   --success: 142 55% 38%;
   --warning: 38 92% 50%;
-  --border: 28 12% 88%;
-  --input: 28 12% 88%;
+  --border: 180 5% 77%;
+  --input: 180 5% 77%;
   --ring: 27 32% 52%;
+
+  /* Surface variants */
+  --surface: 40 14% 98%;
+  --surface-dim: 30 4% 86%;
+  --surface-container: 40 5% 93%;
+  --surface-container-low: 30 8% 96%;
+  --surface-container-high: 40 5% 91%;
+  --surface-container-highest: 30 3% 88%;
+  --surface-container-lowest: 0 0% 100%;
+  --surface-variant: 30 3% 88%;
+  --on-surface: 120 7% 11%;
+  --on-surface-variant: 195 4% 27%;
+  --outline: 180 3% 46%;
+  --outline-variant: 180 3% 77%;
 
   /* Radius scale */
   --radius: 0.75rem;
 
-  /* Typographic families (overridable from Settings CMS) */
-  --font-heading: var(--font-heading-var, "Fraunces", ui-serif, Georgia, serif);
-  --font-body: var(--font-body-var, "Inter", ui-sans-serif, system-ui, sans-serif);
+  /* Typographic families */
+  --font-heading: var(--font-display-var, "Libre Caslon Text", "Georgia", ui-serif, serif);
+  --font-body: var(--font-body-var, "DM Sans", ui-sans-serif, system-ui, sans-serif);
+  --font-label: var(--font-label-var, "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif);
 
-  /* Shadows — soft, layered, premium */
+  /* Shadows */
   --shadow-xs: 0 1px 2px 0 hsl(24 10% 10% / 0.04);
   --shadow-sm: 0 1px 3px 0 hsl(24 10% 10% / 0.06), 0 1px 2px -1px hsl(24 10% 10% / 0.06);
   --shadow-md: 0 4px 12px -2px hsl(24 10% 10% / 0.08), 0 2px 6px -2px hsl(24 10% 10% / 0.05);
@@ -81,10 +97,22 @@
   --border: 24 8% 20%;
   --input: 24 8% 22%;
   --ring: 27 38% 58%;
+
+  --surface: 24 10% 7%;
+  --surface-dim: 24 8% 12%;
+  --surface-container: 24 8% 10%;
+  --surface-container-low: 24 8% 9%;
+  --surface-container-high: 24 8% 14%;
+  --surface-container-highest: 24 8% 18%;
+  --surface-container-lowest: 24 10% 6%;
+  --surface-variant: 24 8% 18%;
+  --on-surface: 40 20% 94%;
+  --on-surface-variant: 30 8% 62%;
+  --outline: 30 6% 40%;
+  --outline-variant: 24 8% 28%;
 }
 
-/* Map design tokens into Tailwind's theme so `bg-background`, `text-brand`,
-   `rounded-lg`, `shadow-md`, `font-heading` etc. all resolve. */
+/* Map design tokens into Tailwind's theme */
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -96,6 +124,7 @@
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-container: hsl(var(--secondary-container));
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-accent: hsl(var(--accent));
@@ -110,8 +139,22 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
+  --color-surface: hsl(var(--surface));
+  --color-surface-dim: hsl(var(--surface-dim));
+  --color-surface-container: hsl(var(--surface-container));
+  --color-surface-container-low: hsl(var(--surface-container-low));
+  --color-surface-container-high: hsl(var(--surface-container-high));
+  --color-surface-container-highest: hsl(var(--surface-container-highest));
+  --color-surface-container-lowest: hsl(var(--surface-container-lowest));
+  --color-surface-variant: hsl(var(--surface-variant));
+  --color-on-surface: hsl(var(--on-surface));
+  --color-on-surface-variant: hsl(var(--on-surface-variant));
+  --color-outline: hsl(var(--outline));
+  --color-outline-variant: hsl(var(--outline-variant));
+
   --font-heading: var(--font-heading);
   --font-body: var(--font-body);
+  --font-label: var(--font-label);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -146,8 +189,8 @@
     border-color: hsl(var(--border));
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: hsl(var(--surface));
+    color: hsl(var(--on-surface));
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -158,7 +201,7 @@
     text-wrap: balance;
   }
   ::selection {
-    background-color: hsl(var(--accent) / 0.24);
+    background-color: hsl(var(--secondary-container));
   }
   :focus-visible {
     outline: 2px solid hsl(var(--ring));
@@ -167,26 +210,94 @@
 }
 
 @layer utilities {
-  /* Fluid display type used across hero / section headings */
+  /* ── Editorial Typography ── */
+  .text-display-lg {
+    font-family: var(--font-heading);
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+  }
+  .text-headline-lg {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.17;
+    font-weight: 400;
+  }
+  .text-headline-md {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    line-height: 1.3;
+    font-weight: 400;
+  }
+  .text-body-lg {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    line-height: 2rem;
+    font-weight: 400;
+  }
+  .text-body-md {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75rem;
+    font-weight: 400;
+  }
+  .text-label-caps {
+    font-family: var(--font-label);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .text-quote-serif {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  /* Legacy display (still used by some ShadCN components) */
   .text-display {
     font-size: clamp(2.5rem, 6vw, 5.5rem);
     line-height: 1.02;
     font-weight: 500;
   }
   .text-eyebrow {
+    font-family: var(--font-label);
     font-size: 0.75rem;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     font-weight: 600;
   }
+
+  /* ── Layout ── */
   .container-page {
     width: 100%;
     max-width: 80rem;
     margin-inline: auto;
     padding-inline: 1.5rem;
   }
+  .container-editorial {
+    width: 100%;
+    max-width: 90rem; /* 1440px */
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-editorial {
+      padding-inline: 5rem; /* 80px margins */
+    }
+  }
 
-  /* Reveal-on-scroll base state (paired with IntersectionObserver / motion) */
+  /* ── Organic hero blob mask ── */
+  .blob-mask {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    overflow: hidden;
+  }
+
+  /* ── Reveal-on-scroll base state ── */
   .reveal {
     opacity: 0;
     transform: translateY(1.5rem);

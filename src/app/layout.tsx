@@ -1,19 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Libre_Caslon_Text, DM_Sans, Hanken_Grotesk } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
-const inter = Inter({
+const libreCaslon = Libre_Caslon_Text({
+  subsets: ["latin"],
+  variable: "--font-display-var",
+  display: "swap",
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+});
+
+const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-body-var",
   display: "swap",
+  weight: ["400", "500"],
 });
 
-const fraunces = Fraunces({
+const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-heading-var",
+  variable: "--font-label-var",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "800"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +39,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf8f5" },
+    { media: "(prefers-color-scheme: light)", color: "#faf9f6" },
     { media: "(prefers-color-scheme: dark)", color: "#141210" },
   ],
   width: "device-width",
@@ -39,7 +48,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${fraunces.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${libreCaslon.variable} ${dmSans.variable} ${hankenGrotesk.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

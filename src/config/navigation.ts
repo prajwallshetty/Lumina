@@ -2,41 +2,33 @@
 export type NavLink = { label: string; href: string };
 
 export const primaryNav: NavLink[] = [
-  { label: "About", href: "/about" },
+  { label: "Projects", href: "/portfolio" },
   { label: "Services", href: "/services" },
-  { label: "Portfolio", href: "/portfolio" },
-  { label: "Before & After", href: "/before-after" },
-  { label: "Gallery", href: "/gallery" },
-  { label: "Blog", href: "/blog" },
+  { label: "About", href: "/about" },
+  { label: "Process", href: "/about#process" },
+  { label: "Journal", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
 
 export const footerNav: { heading: string; links: NavLink[] }[] = [
   {
-    heading: "Studio",
+    heading: "Quick Links",
     links: [
-      { label: "About", href: "/about" },
-      { label: "Careers", href: "/careers" },
-      { label: "Testimonials", href: "/testimonials" },
-      { label: "Blog", href: "/blog" },
-    ],
-  },
-  {
-    heading: "Work",
-    links: [
-      { label: "Portfolio", href: "/portfolio" },
-      { label: "Before & After", href: "/before-after" },
-      { label: "Gallery", href: "/gallery" },
+      { label: "Projects", href: "/portfolio" },
       { label: "Services", href: "/services" },
+      { label: "About", href: "/about" },
+      { label: "Process", href: "/about#process" },
+      { label: "Journal", href: "/blog" },
     ],
   },
   {
-    heading: "Support",
+    heading: "Services",
     links: [
-      { label: "Contact", href: "/contact" },
-      { label: "FAQs", href: "/faqs" },
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms", href: "/terms" },
+      { label: "Residential Interiors", href: "/services" },
+      { label: "Commercial Interiors", href: "/services" },
+      { label: "Renovation", href: "/services" },
+      { label: "Furniture Design", href: "/services" },
+      { label: "Turnkey Projects", href: "/services" },
     ],
   },
 ];
