@@ -1,7 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Libre_Caslon_Text, DM_Sans, Hanken_Grotesk } from "next/font/google";
+import { Cormorant_Garamond, Inter, Hanken_Grotesk, Libre_Caslon_Text, DM_Sans } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-serif-luxury",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body-editorial",
+  display: "swap",
+  weight: ["300", "400", "500", "600"],
+});
 
 const libreCaslon = Libre_Caslon_Text({
   subsets: ["latin"],
@@ -39,7 +54,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf9f6" },
+    { media: "(prefers-color-scheme: light)", color: "#FCFAF8" },
     { media: "(prefers-color-scheme: dark)", color: "#141210" },
   ],
   width: "device-width",
@@ -51,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${libreCaslon.variable} ${dmSans.variable} ${hankenGrotesk.variable}`}
+      className={`${cormorant.variable} ${inter.variable} ${libreCaslon.variable} ${dmSans.variable} ${hankenGrotesk.variable}`}
     >
       <body>{children}</body>
     </html>

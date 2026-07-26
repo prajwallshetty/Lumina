@@ -56,8 +56,10 @@
   --radius: 0.75rem;
 
   /* Typographic families */
-  --font-heading: var(--font-display-var, "Libre Caslon Text", "Georgia", ui-serif, serif);
-  --font-body: var(--font-body-var, "DM Sans", ui-sans-serif, system-ui, sans-serif);
+  --font-serif-luxury: var(--font-serif-luxury, "Cormorant Garamond", serif);
+  --font-body-editorial: var(--font-body-editorial, "Inter", sans-serif);
+  --font-heading: var(--font-serif-luxury, "Cormorant Garamond", "Libre Caslon Text", serif);
+  --font-body: var(--font-body-editorial, "Inter", "DM Sans", sans-serif);
   --font-label: var(--font-label-var, "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif);
 
   /* Shadows */

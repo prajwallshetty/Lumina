@@ -1,56 +1,101 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+import { ArrowUpRight, Mail } from "lucide-react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 
 export function BottomCta() {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email) {
+      setSubscribed(true);
+      setEmail("");
+    }
+  };
+
   return (
-    <section className="py-24">
-      <div className="container-editorial">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-surface-container rounded-lg p-12 lg:p-20 flex flex-col lg:flex-row items-center justify-between gap-12 border border-outline-variant/30"
-        >
-          <div className="flex items-start gap-8">
-            {/* Decorative circle */}
-            <div className="w-20 hidden lg:block opacity-30">
-              <svg
-                viewBox="0 0 80 80"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.5"
-                className="w-full h-auto"
-              >
-                <circle cx="40" cy="40" r="38" />
-                <circle cx="40" cy="40" r="28" />
-                <circle cx="40" cy="40" r="18" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-headline-lg mb-4">
-                Let&apos;s Design
-                <br />
-                Your Dream Space
+    <section className="py-24 bg-[#FCFAF8] relative z-20 select-none overflow-hidden">
+      <div className="max-w-[1480px] mx-auto px-6 sm:px-12 lg:px-16">
+        {/* Soft Warm Floating Ambient Background Blobs */}
+        <div className="relative w-full bg-[#FAF7F2] rounded-[40px] p-10 sm:p-16 lg:p-20 border border-black/[0.06] shadow-xl overflow-hidden">
+          {/* Floating Blob 1 */}
+          <motion.div
+            className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#B79D89]/15 blur-3xl pointer-events-none"
+            animate={{
+              scale: [1, 1.2, 1],
+              x: [0, 30, 0],
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          {/* Floating Blob 2 */}
+          <motion.div
+            className="absolute -bottom-20 -right-20 w-96 h-96 rounded-full bg-[#111111]/5 blur-3xl pointer-events-none"
+            animate={{
+              scale: [1.1, 0.9, 1.1],
+              y: [0, -30, 0],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+            {/* Left Headline & Content */}
+            <div className="lg:col-span-6">
+              <span className="text-[11px] font-semibold tracking-[0.25em] text-[#6F6F6F] uppercase block mb-3">
+                THE LUMINA JOURNAL
+              </span>
+              <h2 className="font-heading text-4xl sm:text-5xl font-light text-[#111111] leading-tight tracking-tight mb-4">
+                Stay <span className="italic font-normal">Inspired.</span>
               </h2>
-              <p className="text-body-md text-on-surface-variant max-w-sm">
-                Ready to bring your vision to life? Schedule a consultation with
-                our design experts today.
+              <p className="font-body text-xs sm:text-sm text-[#6F6F6F] leading-relaxed max-w-md">
+                Subscribe to receive private invitations to architectural project debuts, design essays, and material stories.
               </p>
             </div>
-          </div>
 
-          <Link
-            href="/contact?intent=consultation"
-            className="bg-primary text-primary-foreground px-16 py-6 text-label-caps flex items-center gap-3 hover:opacity-90 transition-all hover:scale-105 active:scale-95 shadow-2xl shrink-0"
-          >
-            Book Consultation
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </motion.div>
+            {/* Right Newsletter Glass Input Form */}
+            <div className="lg:col-span-6">
+              {subscribed ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-black/10 text-center"
+                >
+                  <p className="font-heading text-lg text-[#111111] font-medium">
+                    Thank you for subscribing.
+                  </p>
+                  <p className="text-xs text-[#6F6F6F] mt-1">
+                    Welcome to the Lumina Spaces inner circle.
+                  </p>
+                </motion.div>
+              ) : (
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="relative w-full">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6F6F6F]" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email address"
+                      required
+                      className="w-full bg-white/90 backdrop-blur-md border border-black/10 rounded-full pl-12 pr-6 py-4 text-xs font-body text-[#111111] placeholder:text-[#6F6F6F]/60 focus:outline-none focus:border-[#B79D89] transition-colors shadow-xs"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    data-cursor-magnetic
+                    className="w-full sm:w-auto whitespace-nowrap bg-[#111111] text-white px-8 py-4 rounded-full text-[11px] tracking-[0.16em] uppercase font-bold transition-all duration-300 hover:bg-[#B79D89] shadow-md group flex items-center justify-center gap-2"
+                  >
+                    <span>SUBSCRIBE</span>
+                    <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

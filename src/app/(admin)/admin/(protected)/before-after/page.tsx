@@ -10,7 +10,7 @@ import { db } from "@/lib/db";
 export const metadata: Metadata = { title: "Before & After" };
 
 export default async function AdminBeforeAfterPage() {
-  const items = await db.beforeAfter.findMany({ orderBy: { order: "asc" } });
+  const items = await db.beforeAfter.findMany({ orderBy: { order: "asc" } }).catch(() => []);
 
   return (
     <div className="space-y-6">

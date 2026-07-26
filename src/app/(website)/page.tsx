@@ -1,42 +1,37 @@
 import { Hero } from "@/components/website/home/hero";
-import { ClientLogos } from "@/components/website/home/client-logos";
-import { FeaturedProject } from "@/components/website/home/featured-project";
 import { PortfolioGrid } from "@/components/website/home/portfolio-grid";
-import { StatsSection } from "@/components/website/home/stats-section";
+import { BeforeAfterSection } from "@/components/website/home/before-after-section";
 import { PhilosophySection } from "@/components/website/home/philosophy-section";
 import { TestimonialsSection } from "@/components/website/home/testimonials-section";
 import { BottomCta } from "@/components/website/home/bottom-cta";
 import { getHomepageContent } from "@/services/homepage.service";
 
 export default async function HomePage() {
-  const home = await getHomepageContent();
+  // Gracefully handle missing DATABASE_URL — all sections have built-in defaults.
+  const home = await getHomepageContent().catch(() => null);
 
   return (
     <>
       <Hero
-        eyebrow={home.heroEyebrow}
-        title={home.heroTitle}
-        subtitle={home.heroSubtitle}
-        mediaUrl={home.heroMediaUrl}
+        eyebrow={home?.heroEyebrow}
+        title={home?.heroTitle}
+        subtitle={home?.heroSubtitle}
+        mediaUrl={home?.heroMediaUrl}
         primaryCta={
-          home.heroPrimaryCtaLabel && home.heroPrimaryCtaHref
+          home?.heroPrimaryCtaLabel && home?.heroPrimaryCtaHref
             ? { label: home.heroPrimaryCtaLabel, href: home.heroPrimaryCtaHref }
             : null
         }
         secondaryCta={
-          home.heroSecondaryCtaLabel && home.heroSecondaryCtaHref
+          home?.heroSecondaryCtaLabel && home?.heroSecondaryCtaHref
             ? { label: home.heroSecondaryCtaLabel, href: home.heroSecondaryCtaHref }
             : null
         }
       />
 
-      <ClientLogos />
-
-      <FeaturedProject />
-
       <PortfolioGrid />
 
-      {home.showStats && <StatsSection />}
+      <BeforeAfterSection />
 
       <PhilosophySection />
 

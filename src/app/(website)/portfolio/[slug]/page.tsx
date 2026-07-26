@@ -39,7 +39,7 @@ export default async function ProjectDetailPage({ params }: Params) {
   const project = await getProjectBySlug(slug);
   if (!project) notFound();
 
-  const related = await getRelatedProjects(project.id, project.categoryId, 3);
+  const related = await getRelatedProjects(project.id, project.categoryId ?? null, 3);
 
   return (
     <>

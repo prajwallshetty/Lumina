@@ -45,8 +45,8 @@ export default async function BlogPostPage({ params }: Params) {
             {post.author && (
               <div className="mt-6 flex items-center gap-3">
                 <Avatar>
-                  {post.author.image && <AvatarImage src={post.author.image} alt={post.author.name} />}
-                  <AvatarFallback>{initials(post.author.name)}</AvatarFallback>
+                  {post.author.image && <AvatarImage src={post.author.image} alt={post.author.name ?? "Author"} />}
+                  <AvatarFallback>{initials(post.author.name ?? "Lumina")}</AvatarFallback>
                 </Avatar>
                 <span className="text-sm font-medium">{post.author.name}</span>
               </div>
