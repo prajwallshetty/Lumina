@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useId } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Plus } from "lucide-react";
@@ -25,7 +24,8 @@ const PROJECTS: Project[] = [
     location: "BENGALURU, INDIA",
     imageUrl:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop",
-    asymmetry: [1.08, 0.95, 1.12, 0.88, 1.05, 0.92, 1.15, 0.98, 1.04, 0.90, 1.10, 0.94, 1.06, 0.88, 1.12, 0.96],
+    // 3 broad smooth waves
+    asymmetry: [1.12, 1.10, 0.96, 0.90, 0.94, 1.08, 1.12, 1.05, 0.94, 0.90, 0.95, 1.08, 1.12, 1.06, 0.95, 0.90],
   },
   {
     id: "the-courtyard-villa",
@@ -35,7 +35,8 @@ const PROJECTS: Project[] = [
     location: "GOA, INDIA",
     imageUrl:
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
-    asymmetry: [0.92, 1.15, 0.88, 1.08, 0.94, 1.12, 0.90, 1.06, 0.95, 1.18, 0.86, 1.10, 0.92, 1.14, 0.88, 1.05],
+    // 3 offset broad waves
+    asymmetry: [0.90, 1.05, 1.12, 1.08, 0.95, 0.90, 0.98, 1.10, 1.12, 1.04, 0.92, 0.90, 0.96, 1.08, 1.12, 0.98],
   },
   {
     id: "the-calm-residence",
@@ -45,7 +46,8 @@ const PROJECTS: Project[] = [
     location: "PUNE, INDIA",
     imageUrl:
       "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1000&auto=format&fit=crop",
-    asymmetry: [1.14, 0.90, 1.06, 0.94, 1.18, 0.86, 1.05, 0.92, 1.12, 0.88, 1.08, 0.96, 1.15, 0.90, 1.04, 0.98],
+    // 4 smooth waves
+    asymmetry: [1.12, 0.98, 0.90, 1.02, 1.12, 1.00, 0.90, 0.98, 1.12, 1.02, 0.90, 0.96, 1.12, 0.98, 0.90, 1.02],
   },
   {
     id: "the-oakline-retreat",
@@ -55,7 +57,8 @@ const PROJECTS: Project[] = [
     location: "COORG, INDIA",
     imageUrl:
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1000&auto=format&fit=crop",
-    asymmetry: [0.90, 1.12, 0.95, 1.16, 0.88, 1.04, 0.96, 1.10, 0.92, 1.14, 0.86, 1.08, 0.98, 1.15, 0.90, 1.05],
+    // 3 smooth waves
+    asymmetry: [0.96, 1.12, 1.06, 0.92, 0.90, 1.04, 1.12, 1.00, 0.90, 0.95, 1.08, 1.12, 0.98, 0.90, 0.92, 1.04],
   },
 ];
 
@@ -66,6 +69,7 @@ const BASE_RADIUS = 195;
 
 function BlobProjectCard({ project, index }: { project: Project; index: number }) {
   const maskId = useId();
+  const gradientId = useId();
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [pathD, setPathD] = useState("");
@@ -95,7 +99,7 @@ function BlobProjectCard({ project, index }: { project: Project; index: number }
       if (diff > Math.PI) diff = 2 * Math.PI - diff;
 
       const pullFactor = Math.exp(-Math.pow(diff / 0.6, 2));
-      const pullOffset = pullFactor * 40 * mouseDistRatio;
+      const pullOffset = pullFactor * 30 * mouseDistRatio;
 
       targetRadiiRef.current[i] =
         BASE_RADIUS * project.asymmetry[i] + pullOffset;
@@ -115,11 +119,11 @@ function BlobProjectCard({ project, index }: { project: Project; index: number }
     const animate = (now: number) => {
       const elapsed = (now - startTime) / 1000;
 
-      // Organic multi-harmonic wave breathing
+      // Slow, elegant wave breathing
       const idleOffsets = new Array(POINT_COUNT);
       for (let i = 0; i < POINT_COUNT; i++) {
         const phaseShift = (i * 2 * Math.PI) / POINT_COUNT;
-        const wave = Math.sin((elapsed * 2 * Math.PI) / 8 + phaseShift) * 10;
+        const wave = Math.sin((elapsed * 2 * Math.PI) / 12 + phaseShift) * 6;
         idleOffsets[i] = wave;
       }
 
@@ -183,7 +187,7 @@ function BlobProjectCard({ project, index }: { project: Project; index: number }
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col group relative"
+      className={`flex flex-col group relative ${index % 2 === 1 ? "md:translate-y-16" : ""}`}
     >
       <Link
         href={`/portfolio/${project.id}`}
@@ -194,75 +198,64 @@ function BlobProjectCard({ project, index }: { project: Project; index: number }
           ref={cardRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="relative w-full aspect-square max-w-[360px] mx-auto flex items-center justify-center transition-transform duration-500 group-hover:scale-105"
+          className="relative w-full aspect-square max-w-[480px] mx-auto flex items-center justify-center transition-transform duration-500 group-hover:scale-105"
         >
-          {/* SVG Mask Definition */}
-          <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-            <defs>
-              <clipPath id={maskId} clipPathUnits="userSpaceOnUse">
-                <path d={pathD} />
-              </clipPath>
-            </defs>
-          </svg>
-
           {/* Soft Shadow Layer */}
           <div
             className="absolute inset-4 rounded-full pointer-events-none transition-all duration-700 bg-radial from-[#111111]/25 via-black/5 to-transparent blur-2xl group-hover:blur-3xl group-hover:scale-110"
             style={{ transform: "translateY(20px)" }}
           />
 
-          {/* Multi-layered Ceramic Blob Frame */}
+          {/* SVG Frame, Mask, and Masked Image (Single Coordinate System) */}
           <svg
-            className="absolute inset-0 w-full h-full pointer-events-none z-10"
+            className="absolute inset-0 w-full h-full pointer-events-auto"
             viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}
           >
-            <path
-              d={pathD}
-              fill="none"
-              stroke="#FCFAF8"
-              strokeWidth="24"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              style={{
-                filter: "drop-shadow(0 10px 18px rgba(17,17,17,0.08))",
-              }}
-            />
-            <path
-              d={pathD}
-              fill="none"
-              stroke="rgba(183, 157, 137, 0.4)"
-              strokeWidth="2"
-            />
-          </svg>
+            <defs>
+              <clipPath id={maskId}>
+                <path d={pathD} />
+              </clipPath>
 
-          {/* SVG Path Masked Image Container */}
-          <div
-            className="w-full h-full relative overflow-hidden"
-            style={{
-              clipPath: pathD ? `url(#${maskId})` : undefined,
-              WebkitClipPath: pathD ? `url(#${maskId})` : undefined,
-            }}
-          >
-            {/* Number Tag Top-Left inside image */}
-            <div className="absolute top-8 left-8 z-20 font-mono text-xs font-light text-white/80 tracking-widest pointer-events-none">
+              {/* Dynamic shadow/overlay gradient */}
+              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="60%" stopColor="transparent" stopOpacity="0" />
+                <stop offset="100%" stopColor="black" stopOpacity="0.4" />
+              </linearGradient>
+            </defs>
+
+            {/* Soft background fill to cover gaps during load */}
+            <path d={pathD} fill="#FCFAF8" />
+
+            {/* Masked Image inside SVG to prevent edge cuts */}
+            <g clipPath={`url(#${maskId})`}>
+              <image
+                href={project.imageUrl}
+                width={SVG_SIZE}
+                height={SVG_SIZE}
+                preserveAspectRatio="xMidYMid slice"
+                className="transition-transform duration-1000 ease-[0.16,1,0.3,1] group-hover:scale-[1.08] group-hover:rotate-1 origin-center"
+              />
+              {/* Vignette Overlay */}
+              <rect
+                width={SVG_SIZE}
+                height={SVG_SIZE}
+                fill={`url(#${gradientId})`}
+                className="pointer-events-none"
+              />
+            </g>
+
+            {/* Number Tag inside SVG */}
+            <text
+              x="60"
+              y="75"
+              fill="rgba(255, 255, 255, 0.85)"
+              className="font-mono text-xs font-light tracking-widest pointer-events-none select-none"
+            >
               {project.num}
-            </div>
+            </text>
 
-            {/* Project Image with slow zoom and subtle rotation */}
-            <Image
-              src={project.imageUrl}
-              alt={project.title}
-              fill
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover transition-transform duration-700 ease-[0.16,1,0.3,1] group-hover:scale-112 group-hover:rotate-1"
-            />
 
-            {/* Dark Vignette Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
-
-            {/* Glass Specular Reflection Sweep */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
-          </div>
+          </svg>
         </div>
 
         {/* Project Metadata Below Blob Card */}
@@ -314,7 +307,7 @@ export function PortfolioGrid() {
         </div>
 
         {/* 4 Organic Sculptural Liquid Blob Cards in Asymmetrical Editorial Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-start max-w-[1100px] mx-auto">
           {PROJECTS.map((project, idx) => (
             <BlobProjectCard key={project.id} project={project} index={idx} />
           ))}

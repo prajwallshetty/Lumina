@@ -12,9 +12,9 @@ const stats = [
 
 export function StatsBanner() {
   return (
-    <div className="w-full bg-[#FCFAF8] border-t border-black/[0.08] py-10 sm:py-12 relative z-20">
+    <div className="w-full bg-transparent pt-10 pb-16 sm:pt-14 sm:pb-20 relative z-20">
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-16">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-black/[0.08]">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-black/[0.06]">
           {stats.map((item, idx) => (
             <motion.div
               key={item.label}

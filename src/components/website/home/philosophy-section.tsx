@@ -137,7 +137,7 @@ export function PhilosophySection() {
             {/* Vertical Animated Line */}
             <div className="absolute left-[26px] top-6 bottom-6 w-[1.5px] bg-black/10 hidden sm:block">
               <motion.div
-                className="w-full bg-[#B79D89]"
+                className="w-full bg-[#B79D89] lg:!h-full"
                 animate={{ height: `${((activeStep + 1) / PROCESS_STEPS.length) * 100}%` }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               />
@@ -149,7 +149,7 @@ export function PhilosophySection() {
                 return (
                   <div
                     key={step.number}
-                    className={`p-6 rounded-2xl border transition-all duration-500 ${
+                    className={`p-6 rounded-2xl border transition-all duration-500 lg:bg-white lg:border-black/10 lg:shadow-xs lg:opacity-100 ${
                       isOpen
                         ? "bg-white border-black/10 shadow-lg shadow-black/[0.04]"
                         : "bg-transparent border-black/5 opacity-75 hover:opacity-100"
@@ -157,12 +157,12 @@ export function PhilosophySection() {
                   >
                     <div
                       onClick={() => setActiveStep(idx)}
-                      className="flex items-center justify-between cursor-pointer group"
+                      className="flex items-center justify-between cursor-pointer lg:cursor-default group"
                       data-cursor-magnetic
                     >
                       <div className="flex items-center gap-4">
                         {/* Hand-drawn Icon Circle */}
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 lg:bg-[#111111] lg:text-white ${
                           isOpen ? "bg-[#111111] text-white" : "bg-black/[0.04] text-[#111111] group-hover:bg-[#B79D89] group-hover:text-white"
                         }`}>
                           {step.iconSvg}
@@ -172,14 +172,14 @@ export function PhilosophySection() {
                           <span className="text-[9px] font-mono tracking-widest text-[#B79D89] font-bold block uppercase">
                             {step.subtitle}
                           </span>
-                          <h3 className="font-heading text-xl font-light text-[#111111] tracking-tight group-hover:text-[#B79D89] transition-colors">
+                          <h3 className="font-heading text-xl font-light text-[#111111] tracking-tight lg:text-[#111111] group-hover:text-[#B79D89] transition-colors">
                             {step.title}
                           </h3>
                         </div>
                       </div>
 
-                      {/* Accordion Toggle Circle */}
-                      <button className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[#111111] transition-colors group-hover:bg-black group-hover:text-white">
+                      {/* Accordion Toggle Circle (hidden on desktop) */}
+                      <button className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[#111111] transition-colors group-hover:bg-black group-hover:text-white lg:hidden">
                         {isOpen ? (
                           <ChevronUp className="h-4 w-4" />
                         ) : (
@@ -188,21 +188,31 @@ export function PhilosophySection() {
                       </button>
                     </div>
 
-                    <AnimatePresence>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                          className="overflow-hidden"
-                        >
-                          <p className="mt-4 pt-3 border-t border-black/5 text-xs font-body text-[#6F6F6F] leading-relaxed">
-                            {step.description}
-                          </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {/* Desktop View: Always fully open */}
+                    <div className="hidden lg:block">
+                      <p className="mt-4 pt-3 border-t border-black/5 text-xs font-body text-[#6F6F6F] leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
+
+                    {/* Mobile View: Collapsible Accordion */}
+                    <div className="lg:hidden">
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <p className="mt-4 pt-3 border-t border-black/5 text-xs font-body text-[#6F6F6F] leading-relaxed">
+                              {step.description}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 );
               })}
