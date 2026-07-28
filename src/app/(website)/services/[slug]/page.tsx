@@ -30,7 +30,7 @@ export default async function ServiceDetailPage({ params }: Params) {
 
   return (
     <>
-      <Section className="pt-16 md:pt-24">
+      <Section className="pt-32 md:pt-40">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
             <SectionHeading eyebrow="Service" title={service.title} description={service.excerpt ?? undefined} />

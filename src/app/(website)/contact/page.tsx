@@ -19,7 +19,7 @@ export default async function ContactPage({ searchParams }: Search) {
   const settings = await getSiteSettings().catch(() => null);
 
   return (
-    <Section className="pt-16 md:pt-24">
+    <Section className="pt-32 md:pt-40">
       <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <SectionHeading

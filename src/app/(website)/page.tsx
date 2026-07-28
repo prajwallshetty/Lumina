@@ -16,7 +16,7 @@ export default async function HomePage() {
         eyebrow={home?.heroEyebrow}
         title={home?.heroTitle}
         subtitle={home?.heroSubtitle}
-        mediaUrl={home?.heroMediaUrl}
+        mediaUrl={home?.heroMediaUrl || "/luminahero.mp4"}
         primaryCta={
           home?.heroPrimaryCtaLabel && home?.heroPrimaryCtaHref
             ? { label: home.heroPrimaryCtaLabel, href: home.heroPrimaryCtaHref }

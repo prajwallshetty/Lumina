@@ -96,12 +96,12 @@ export function Hero({
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen pt-32 sm:pt-36 lg:pt-40 pb-12 flex flex-col justify-between overflow-hidden bg-[#FCFAF8] select-none"
+      className="relative min-h-screen pt-40 sm:pt-44 lg:pt-48 pb-12 flex flex-col justify-between overflow-hidden bg-[#FCFAF8] select-none"
     >
       {/* Abstract warm lighting & noise background */}
       <NoiseBackground />
 
-      <div className="w-full max-w-[1480px] mx-auto px-6 sm:px-12 lg:px-16 z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-center flex-1">
+      <div className="w-full max-w-[1680px] mx-auto px-6 sm:px-12 lg:px-16 z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-center flex-1">
         {/* LEFT COLUMN: Large Editorial Serif Typography */}
         <div ref={textColRef} className="lg:col-span-5 flex flex-col justify-center">
           {/* Eyebrow */}

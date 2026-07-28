@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ArrowUpRight, Menu } from "lucide-react";
@@ -66,27 +67,16 @@ export function SiteHeader() {
               : "py-3.5 bg-white/75 backdrop-blur-xl shadow-[0_10px_30px_-5px_rgba(0,0,0,0.04)]"
           )}
         >
-          {/* Logo Left: Geometric Architectural Emblem + Title */}
+          {/* Logo Left: Brand Image Logo */}
           <Link href="/" className="group flex items-center gap-3" data-cursor-magnetic>
-            <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center bg-black/[0.02] group-hover:bg-[#111111] group-hover:text-white transition-colors duration-300">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M3 21h18" />
-                <path d="M5 21V7l7-4 7 4v14" />
-                <path d="M9 21v-8h6v8" />
-              </svg>
-            </div>
-            <span className="font-heading text-base font-semibold tracking-[0.18em] text-[#1A1A1A] uppercase">
-              Lumina <span className="font-light text-[#6F6F6F]">Spaces</span>
-            </span>
+            <Image
+              src="/luminalogo.png"
+              alt="Lumina Spaces"
+              width={240}
+              height={70}
+              priority
+              className="h-14 sm:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop Links Center */}
@@ -142,7 +132,7 @@ export function SiteHeader() {
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="w-10 h-10 rounded-full border border-black/10 bg-black/[0.02] flex items-center justify-center text-[#1A1A1A] transition-all duration-300 hover:bg-black hover:text-white"
+                  className="lg:hidden w-10 h-10 rounded-full border border-black/10 bg-black/[0.02] flex items-center justify-center text-[#1A1A1A] transition-all duration-300 hover:bg-black hover:text-white"
                   aria-label="Open Navigation Menu"
                   data-cursor-magnetic
                 >

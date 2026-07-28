@@ -15,7 +15,7 @@ export default async function ServicesPage() {
   const services = await getPublishedServices();
 
   return (
-    <Section className="pt-16 md:pt-24">
+    <Section className="pt-32 md:pt-40">
       <SectionHeading
         eyebrow="Services"
         title="Everything your space needs, under one studio"

@@ -23,7 +23,8 @@ export function AdminTopbar({ user }: { user: SessionUser }) {
   const router = useRouter();
 
   const onSignOut = async () => {
-    await authClient.signOut();
+    document.cookie = "lumina_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    await authClient.signOut().catch(() => {});
     router.push("/admin/sign-in");
     router.refresh();
   };

@@ -22,7 +22,7 @@ export default async function FaqsPage() {
   }
 
   return (
-    <Section className="pt-16 md:pt-24">
+    <Section className="pt-32 md:pt-40">
       <SectionHeading eyebrow="FAQs" title="Questions, answered" />
       <div className="mx-auto mt-12 max-w-3xl space-y-12">
         {faqs.length > 0 ? (

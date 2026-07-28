@@ -6,7 +6,7 @@ export async function LegalPage({ slug, fallbackTitle }: { slug: string; fallbac
   const page = await getPageBySlug(slug);
 
   return (
-    <Section className="pt-16 md:pt-24">
+    <Section className="pt-32 md:pt-40">
       <div className="mx-auto max-w-3xl">
         <h1 className="font-heading text-4xl font-medium">{page?.title ?? fallbackTitle}</h1>
         {page?.updatedAt && (

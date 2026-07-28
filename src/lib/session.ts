@@ -13,9 +13,46 @@ export type SessionUser = {
   isActive: boolean;
 };
 
+import { cookies } from "next/headers";
+import { db } from "./db";
+
 /** Read the current session (deduped per request). Returns null when signed out. */
 export const getSession = cache(async () => {
-  const session = await auth.api.getSession({ headers: await headers() });
+  // Check custom password-only session cookie first
+  try {
+    const cookieStore = await cookies();
+    const adminSession = cookieStore.get("lumina_admin_session")?.value;
+    
+    if (adminSession === "authenticated") {
+      const dbUser = await db.user.findFirst({
+        where: { role: "SUPER_ADMIN", isActive: true },
+      });
+      if (dbUser) {
+        return {
+          user: {
+            id: dbUser.id,
+            name: dbUser.name,
+            email: dbUser.email,
+            image: dbUser.image,
+            role: dbUser.role,
+            isActive: dbUser.isActive,
+          } as SessionUser,
+          session: {
+            id: "mock-session",
+            userId: dbUser.id,
+            token: "mock-token",
+            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Error reading custom session cookie", e);
+  }
+
+  const session = await auth.api.getSession({ headers: await headers() }).catch(() => null);
   if (!session) return null;
   return {
     user: session.user as unknown as SessionUser,

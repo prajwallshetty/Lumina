@@ -19,6 +19,8 @@ import {
   Settings,
   Search,
   ScrollText,
+  Mail,
+  Menu,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -48,10 +50,12 @@ export const adminNav: AdminNavItem[] = [
 
   { label: "Inquiries", href: "/admin/inquiries", icon: Inbox, group: "Sales", roles: ["SUPER_ADMIN", "ADMIN", "SALES"] },
   { label: "Bookings", href: "/admin/bookings", icon: CalendarClock, group: "Sales", roles: ["SUPER_ADMIN", "ADMIN", "SALES", "DESIGNER"] },
+  { label: "Newsletter", href: "/admin/newsletter", icon: Mail, group: "Sales", roles: ["SUPER_ADMIN", "ADMIN"] },
 
   { label: "Media Library", href: "/admin/media", icon: ImagePlus, group: "Assets" },
 
   { label: "Users", href: "/admin/users", icon: Users, group: "System", roles: ["SUPER_ADMIN", "ADMIN"] },
+  { label: "Navigation", href: "/admin/navigation", icon: Menu, group: "System", roles: ["SUPER_ADMIN", "ADMIN"] },
   { label: "SEO", href: "/admin/seo", icon: Search, group: "System", roles: ["SUPER_ADMIN", "ADMIN", "CONTENT_EDITOR"] },
   { label: "Audit Log", href: "/admin/audit", icon: ScrollText, group: "System", roles: ["SUPER_ADMIN", "ADMIN"] },
   { label: "Settings", href: "/admin/settings", icon: Settings, group: "System", roles: ["SUPER_ADMIN", "ADMIN"] },

@@ -15,7 +15,7 @@ export default async function BeforeAfterPage() {
   const items = await getBeforeAfters();
 
   return (
-    <Section className="pt-16 md:pt-24">
+    <Section className="pt-32 md:pt-40">
       <SectionHeading
         eyebrow="Transformations"
         title="Before &amp; after"

@@ -43,7 +43,7 @@ export default async function ProjectDetailPage({ params }: Params) {
 
   return (
     <>
-      <Section className="pt-16 md:pt-24">
+      <Section className="pt-32 md:pt-40">
         <div className="flex flex-col gap-4">
           {project.category && <Badge variant="accent" className="w-fit">{project.category.name}</Badge>}
           <SectionHeading title={project.title} description={project.summary ?? undefined} />

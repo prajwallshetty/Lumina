@@ -34,7 +34,7 @@ export default async function BlogPostPage({ params }: Params) {
   return (
     <>
       <article>
-        <Section className="pt-16 md:pt-24">
+        <Section className="pt-32 md:pt-40">
           <div className="mx-auto max-w-3xl">
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               {post.category && <Badge variant="accent">{post.category.name}</Badge>}

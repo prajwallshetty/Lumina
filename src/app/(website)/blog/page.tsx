@@ -23,7 +23,7 @@ export default async function BlogPage({ searchParams }: Search) {
   ]);
 
   return (
-    <Section className="pt-16 md:pt-24">
+    <Section className="pt-32 md:pt-40">
       <SectionHeading eyebrow="Journal" title="Ideas & inspiration" />
 
       {categories.length > 0 && (

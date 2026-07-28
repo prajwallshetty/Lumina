@@ -23,7 +23,7 @@ export default async function JobDetailPage({ params }: Params) {
   if (!job) notFound();
 
   return (
-    <Section className="pt-16 md:pt-24">
+    <Section className="pt-32 md:pt-40">
       <div className="mx-auto max-w-3xl">
         <div className="flex flex-wrap items-center gap-3">
           {job.department && <Badge variant="accent">{job.department}</Badge>}

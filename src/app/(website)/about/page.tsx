@@ -16,7 +16,7 @@ export default async function AboutPage() {
 
   return (
     <>
-      <Section className="pb-8 pt-16 md:pt-24">
+      <Section className="pb-8 pt-32 md:pt-40">
         <SectionHeading
           eyebrow="Our studio"
           title={content.storyTitle ?? "Design that lasts beyond the trend cycle"}

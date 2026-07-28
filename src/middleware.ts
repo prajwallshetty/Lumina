@@ -15,7 +15,9 @@ export function middleware(request: NextRequest) {
   }
 
   const sessionCookie = getSessionCookie(request, { cookiePrefix: "lumina" });
-  if (!sessionCookie) {
+  const customAdminSession = request.cookies.get("lumina_admin_session")?.value;
+
+  if (!sessionCookie && customAdminSession !== "authenticated") {
     const url = new URL("/admin/sign-in", request.url);
     return NextResponse.redirect(url);
   }

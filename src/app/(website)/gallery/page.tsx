@@ -18,7 +18,7 @@ export default async function GalleryPage() {
   const items = await getGalleryItems();
 
   return (
-    <Section className="pt-16 md:pt-24">
+    <Section className="pt-32 md:pt-40">
       <SectionHeading eyebrow="Gallery" title="Moments of design" />
       <div className="mt-12 columns-1 gap-4 sm:columns-2 lg:columns-3 [&>*]:mb-4">
         {items.length > 0 ? (

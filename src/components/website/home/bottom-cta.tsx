@@ -3,16 +3,23 @@
 import { useState } from "react";
 import { ArrowUpRight, Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { subscribeNewsletter } from "@/actions/newsletter.actions";
+import { toast } from "sonner";
 
 export function BottomCta() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+    try {
+      const res = await subscribeNewsletter({ email });
+      if (!res.ok) throw new Error(res.error);
       setSubscribed(true);
       setEmail("");
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong.");
     }
   };
 

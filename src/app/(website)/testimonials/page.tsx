@@ -22,7 +22,7 @@ export default async function TestimonialsPage() {
 
   return (
     <>
-      <Section className="pt-16 md:pt-24">
+      <Section className="pt-32 md:pt-40">
         <SectionHeading
           eyebrow="Testimonials"
           title="Words from our clients"
