@@ -31,9 +31,9 @@ const FALLBACK_PROJECTS: Record<string, FallbackProject> = {
   "the-ivory-house": {
     id: "the-ivory-house",
     slug: "the-ivory-house",
-    title: "The Ivory House",
+    title: "Masco Grandeur",
     summary: "A serene, light-filled sanctuary crafted with ivory plaster, natural travertine, and warm timber accents in Bengaluru.",
-    description: "Designed for quiet introspection, The Ivory House blends sculptural geometry with tactile natural materials. Large floor-to-ceiling openings connect interior living zones with lush courtyard gardens, creating a seamless dialogue between built environment and nature.",
+    description: "Designed for quiet introspection, Masco Grandeur blends sculptural geometry with tactile natural materials. Large floor-to-ceiling openings connect interior living zones with lush courtyard gardens, creating a seamless dialogue between built environment and nature.",
     coverMediaUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop",
     location: "Bengaluru, India",
     client: "Private Residence",

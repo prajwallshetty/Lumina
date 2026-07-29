@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { LiquidBlob } from "./liquid-blob";
+import { CurvedVideo } from "./curved-video";
 import { NoiseBackground } from "./noise-background";
 import { StatsBanner } from "./stats-banner";
 
@@ -206,7 +206,7 @@ export function Hero({
           </motion.div>
         </div>
 
-        {/* RIGHT COLUMN: 70% Width Hero Video Liquid Blob Sculpture */}
+        {/* RIGHT COLUMN: 70% Width Hero Video Curved Card */}
         <div
           ref={blobColRef}
           className="lg:col-span-7 flex items-center justify-center relative w-full"
@@ -217,7 +217,7 @@ export function Hero({
             transition={{ duration: 1.1, ease: easeCustom, delay: 0.12 }}
             className="w-full flex items-center justify-center"
           >
-            <LiquidBlob videoUrl={mediaUrl ?? undefined} />
+            <CurvedVideo videoUrl={mediaUrl ?? undefined} />
           </motion.div>
         </div>
       </div>

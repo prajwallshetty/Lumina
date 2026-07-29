@@ -19,7 +19,7 @@ const PROJECTS: Project[] = [
   {
     id: "the-ivory-house",
     num: "01",
-    title: "The Ivory House",
+    title: "Masco Grandeur",
     category: "RESIDENTIAL",
     location: "BENGALURU, INDIA",
     imageUrl:
