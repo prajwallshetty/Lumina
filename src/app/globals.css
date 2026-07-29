@@ -313,6 +313,43 @@
   }
 }
 
+/* ── Lenis Smooth Scroll Support ── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* ── Smooth Scroll-Reveal Animations for Text ── */
+.scroll-reveal-item {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 1000ms var(--ease-out-expo),
+    transform 1000ms var(--ease-out-expo);
+  will-change: transform, opacity;
+}
+
+.scroll-reveal-item.reveal-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
