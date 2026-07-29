@@ -483,6 +483,7 @@ model Project {
   designer    User?         @relation("ProjectDesigner", fields: [designerId], references: [id], onDelete: SetNull)
   // Tags for filtering (Minimal / Industrial / Luxury / etc.)
   tags        String[]      @default([])
+  servicesUsed String[]     @default([])
   // SEO
   metaTitle       String?
   metaDescription String? @db.Text
@@ -570,6 +571,8 @@ model GalleryItem {
   isPublished Boolean   @default(true)
   order       Int       @default(0)
   isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([projectId])
   @@index([category])

@@ -89,7 +89,7 @@ export function BeforeAfterSection({ items }: { items?: TransformationItem[] }) 
       // Reveal cursor position and radius lerping
       let targetX = rawMouseRef.current.x;
       let targetY = rawMouseRef.current.y;
-      let targetR = 360; // Large reveal size on hover
+      let targetR = 500; // Large reveal size on hover
 
       if (!isHoveredRef.current) {
         // Idle/Auto-animation: orbit the reveal cursor in a slow premium loop
