@@ -39,6 +39,7 @@ export function BeforeAfterSection({ items }: { items?: TransformationItem[] }) 
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isHoveredRef = useRef(false);
+  const isVisibleRef = useRef(true);
 
   const [pathD, setPathD] = useState("");
   const [revealPathD, setRevealPathD] = useState("");
@@ -62,6 +63,18 @@ export function BeforeAfterSection({ items }: { items?: TransformationItem[] }) 
   const currentRadiiRef = useRef<number[]>(getRectRadii());
   const velocityRef = useRef<number[]>(new Array(POINT_COUNT).fill(0));
 
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -84,6 +97,10 @@ export function BeforeAfterSection({ items }: { items?: TransformationItem[] }) 
     const startTime = performance.now();
 
     const animate = (now: number) => {
+      if (!isVisibleRef.current) {
+        animId = requestAnimationFrame(animate);
+        return;
+      }
       const elapsed = (now - startTime) / 1000;
 
       // Reveal cursor position and radius lerping

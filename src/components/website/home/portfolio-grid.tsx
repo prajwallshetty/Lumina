@@ -31,6 +31,7 @@ function BlobProjectCard({ project, index }: { project: any; index: number }) {
   const maskId = useId();
   const gradientId = useId();
   const cardRef = useRef<HTMLDivElement>(null);
+  const isVisibleRef = useRef(true);
 
   const [pathD, setPathD] = useState("");
   const pathDRef = useRef("");
@@ -43,8 +44,22 @@ function BlobProjectCard({ project, index }: { project: any; index: number }) {
     project.asymmetry.map((a: number) => BASE_RADIUS * a)
   );
 
+  // Pause rAF calculations when out of viewport to conserve CPU/GPU
+  useEffect(() => {
+    if (!cardRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return;
     const rect = cardRef.current.getBoundingClientRect();
     const cX = rect.left + rect.width / 2;
     const cY = rect.top + rect.height / 2;
@@ -67,6 +82,7 @@ function BlobProjectCard({ project, index }: { project: any; index: number }) {
   };
 
   const handleMouseLeave = () => {
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return;
     for (let i = 0; i < POINT_COUNT; i++) {
       targetRadiiRef.current[i] = BASE_RADIUS * project.asymmetry[i];
     }
@@ -77,6 +93,10 @@ function BlobProjectCard({ project, index }: { project: any; index: number }) {
     const startTime = performance.now() + index * 1000;
 
     const animate = (now: number) => {
+      if (!isVisibleRef.current) {
+        animId = requestAnimationFrame(animate);
+        return;
+      }
       const elapsed = (now - startTime) / 1000;
 
       // Slow, elegant wave breathing

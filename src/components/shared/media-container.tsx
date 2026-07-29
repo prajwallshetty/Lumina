@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { ImageIcon, Film } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -34,10 +37,33 @@ export function MediaContainer({
   label,
   kind = "image",
 }: MediaContainerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const Icon = kind === "video" ? Film : ImageIcon;
+
+  // Auto-pause video when scrolled out of viewport
+  useEffect(() => {
+    if (kind !== "video" || !containerRef.current || !videoRef.current) return;
+    const videoEl = videoRef.current;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          videoEl.play().catch(() => {});
+        } else {
+          videoEl.pause();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [kind]);
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         "relative w-full overflow-hidden bg-secondary",
         aspect,
@@ -48,6 +74,7 @@ export function MediaContainer({
       {src ? (
         kind === "video" ? (
           <video
+            ref={videoRef}
             src={src}
             className="w-full h-full object-cover"
             controls
@@ -55,6 +82,7 @@ export function MediaContainer({
             loop
             autoPlay
             playsInline
+            preload="metadata"
           />
         ) : (
           <Image

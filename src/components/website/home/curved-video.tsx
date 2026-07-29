@@ -11,12 +11,35 @@ type CurvedVideoProps = {
 const DEFAULT_VIDEO = "/luminahero.mp4";
 
 export function CurvedVideo({ videoUrl = DEFAULT_VIDEO }: CurvedVideoProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+
+  // Auto-pause video when scrolled out of viewport to conserve CPU/GPU
+  useEffect(() => {
+    if (!containerRef.current || !videoRef.current) return;
+    const videoEl = videoRef.current;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          videoEl.play().catch(() => {});
+          setIsPlaying(true);
+        } else {
+          videoEl.pause();
+          setIsPlaying(false);
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
@@ -67,6 +90,7 @@ export function CurvedVideo({ videoUrl = DEFAULT_VIDEO }: CurvedVideoProps) {
 
   return (
     <div
+      ref={containerRef}
       onClick={togglePlay}
       className="relative w-full aspect-[16/10] max-w-[1700px] xl:max-w-[2000px] 2xl:max-w-[2300px] max-h-[88vh] mx-auto flex items-center justify-center cursor-pointer select-none group"
     >
@@ -90,6 +114,7 @@ export function CurvedVideo({ videoUrl = DEFAULT_VIDEO }: CurvedVideoProps) {
             muted
             loop
             playsInline
+            preload="metadata"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             className="w-full h-full object-cover scale-100 transition-transform duration-[1200ms] cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-[1.04]"
