@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useId } from "react";
 import { motion } from "framer-motion";
 
+import { BeforeAfterSlider } from "@/components/website/before-after-slider";
+
 const DEFAULT_SKETCH_IMAGE =
   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1400&auto=format&fit=crop&sat=-100&con=30";
 
@@ -254,14 +256,23 @@ export function BeforeAfterSection({ items }: { items?: TransformationItem[] }) 
           Drag your cursor across the architectural canvas to reveal reality beneath the drawing.
         </motion.p>
 
-        {/* Giant Interactive Morphing Frame Container */}
+        {/* MOBILE SLIDER (< 768px): Touch-optimized sliding bar with drag handle */}
+        <div className="block md:hidden w-full max-w-[540px] mx-auto mb-10">
+          <BeforeAfterSlider
+            beforeUrl={sketchImage}
+            afterUrl={completedImage}
+            title={activeItem?.title || "Transformation"}
+          />
+        </div>
+
+        {/* DESKTOP CANVAS (>= 768px): Giant Interactive Morphing Frame Container (100% UNTOUCHED) */}
         <div
           ref={containerRef}
           data-cursor="REVEAL"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onMouseMove={handleMouseMove}
-          className="relative w-full aspect-[16/9] max-w-[1140px] mx-auto flex items-center justify-center cursor-crosshair overflow-visible"
+          className="hidden md:flex relative w-full aspect-[16/9] max-w-[1140px] mx-auto items-center justify-center cursor-crosshair overflow-visible"
         >
           {/* Floating Tags (Before / After Labels) */}
           <div className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-black/10 text-[9px] sm:text-[10px] font-bold tracking-[0.2em] uppercase text-[#111111] pointer-events-none select-none">
