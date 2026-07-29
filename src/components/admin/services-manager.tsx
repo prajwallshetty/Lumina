@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { saveService, deleteService } from "@/actions/service.actions";
 import { MediaUploader } from "./media-uploader";
 import { toast } from "sonner";
@@ -216,181 +215,50 @@ export function ServicesManager({ services, faqCategories }: Props) {
             <DialogDescription>Add or update Lumina design services here.</DialogDescription>
           </DialogHeader>
 
-          <Tabs defaultValue="general" className="mt-4">
-            <TabsList className="grid grid-cols-5 w-full bg-secondary">
-              <TabsTrigger value="general">General</TabsTrigger>
-              <TabsTrigger value="benefits">Benefits</TabsTrigger>
-              <TabsTrigger value="process">Process</TabsTrigger>
-              <TabsTrigger value="faqs">FAQs</TabsTrigger>
-              <TabsTrigger value="seo">SEO</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="general" className="space-y-4 pt-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Title</Label>
-                  <Input value={title} onChange={(e) => { setTitle(e.target.value); if (!selectedService) setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-")); }} placeholder="e.g. Turnkey Interior Delivery" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Slug</Label>
-                  <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g. turnkey-delivery" />
-                </div>
+          <div className="space-y-4 mt-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Title</Label>
+                <Input value={title} onChange={(e) => { setTitle(e.target.value); if (!selectedService) setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-")); }} placeholder="e.g. Turnkey Interior Delivery" />
               </div>
               <div className="space-y-2">
-                <Label>Excerpt</Label>
-                <Textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} placeholder="A short description for grids and listings" />
+                <Label>Slug</Label>
+                <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g. turnkey-delivery" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Excerpt</Label>
+              <Textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} placeholder="A short description for grids and listings" />
+            </div>
+            <div className="space-y-2">
+              <Label>Overview</Label>
+              <Textarea value={overview} onChange={(e) => setOverview(e.target.value)} rows={4} placeholder="Full description / detailed text" />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label>Icon Name (Lucide)</Label>
+                <Input value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="Wrench, Paintbrush, etc." />
               </div>
               <div className="space-y-2">
-                <Label>Overview</Label>
-                <Textarea value={overview} onChange={(e) => setOverview(e.target.value)} rows={4} placeholder="Full description / detailed text" />
+                <Label>Display Order</Label>
+                <Input type="number" value={order} onChange={(e) => setOrder(Number(e.target.value))} />
               </div>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="space-y-2">
-                  <Label>Icon Name (Lucide)</Label>
-                  <Input value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="Wrench, Paintbrush, etc." />
+              <div className="flex items-center gap-6 pt-8">
+                <div className="flex items-center gap-2">
+                  <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
+                  <Label>Featured</Label>
                 </div>
-                <div className="space-y-2">
-                  <Label>Display Order</Label>
-                  <Input type="number" value={order} onChange={(e) => setOrder(Number(e.target.value))} />
-                </div>
-                <div className="flex items-center gap-6 pt-8">
-                  <div className="flex items-center gap-2">
-                    <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
-                    <Label>Featured</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch checked={isPublished} onCheckedChange={setIsPublished} />
-                    <Label>Published</Label>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Switch checked={isPublished} onCheckedChange={setIsPublished} />
+                  <Label>Published</Label>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Hero Banner Image</Label>
-                <MediaUploader value={heroMediaUrl} onChange={(url, id) => { setHeroMediaUrl(url); if (id) setHeroMediaPublicId(id); }} onClear={() => { setHeroMediaUrl(""); setHeroMediaPublicId(""); }} />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="benefits" className="space-y-4 pt-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-semibold">Benefits List</Label>
-                <Button type="button" size="sm" onClick={handleAddBenefit}>
-                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Benefit
-                </Button>
-              </div>
-              {benefits.map((b, i) => (
-                <div key={i} className="flex gap-4 items-start border border-border p-4 rounded-lg bg-card">
-                  <div className="grid flex-1 gap-2 sm:grid-cols-3">
-                    <div className="space-y-1">
-                      <Label className="text-xs">Benefit Title</Label>
-                      <Input value={b.title} onChange={(e) => {
-                        const copy = [...benefits];
-                        copy[i].title = e.target.value;
-                        setBenefits(copy);
-                      }} placeholder="e.g. Master Artisans" />
-                    </div>
-                    <div className="space-y-1 sm:col-span-2">
-                      <Label className="text-xs">Body</Label>
-                      <Input value={b.body || ""} onChange={(e) => {
-                        const copy = [...benefits];
-                        copy[i].body = e.target.value;
-                        setBenefits(copy);
-                      }} placeholder="Explain why this benefit matters" />
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="text-destructive mt-5" onClick={() => setBenefits(benefits.filter((_, idx) => idx !== i))}>
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="process" className="space-y-4 pt-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-semibold">Process Steps</Label>
-                <Button type="button" size="sm" onClick={handleAddProcess}>
-                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Step
-                </Button>
-              </div>
-              {processSteps.map((p, i) => (
-                <div key={i} className="flex gap-4 items-start border border-border p-4 rounded-lg bg-card">
-                  <div className="grid flex-1 gap-2 sm:grid-cols-4">
-                    <div className="space-y-1">
-                      <Label className="text-xs">Step No.</Label>
-                      <Input type="number" value={p.step} onChange={(e) => {
-                        const copy = [...processSteps];
-                        copy[i].step = Number(e.target.value);
-                        setProcessSteps(copy);
-                      }} />
-                    </div>
-                    <div className="space-y-1 sm:col-span-2">
-                      <Label className="text-xs">Step Title</Label>
-                      <Input value={p.title} onChange={(e) => {
-                        const copy = [...processSteps];
-                        copy[i].title = e.target.value;
-                        setProcessSteps(copy);
-                      }} placeholder="e.g. Material Curation" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Body</Label>
-                      <Input value={p.body || ""} onChange={(e) => {
-                        const copy = [...processSteps];
-                        copy[i].body = e.target.value;
-                        setProcessSteps(copy);
-                      }} placeholder="Details..." />
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="text-destructive mt-5" onClick={() => setProcessSteps(processSteps.filter((_, idx) => idx !== i))}>
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="faqs" className="space-y-4 pt-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-semibold">Service FAQs</Label>
-                <Button type="button" size="sm" onClick={handleAddFaq}>
-                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Add FAQ
-                </Button>
-              </div>
-              {faqs.map((f, i) => (
-                <div key={i} className="flex gap-4 items-start border border-border p-4 rounded-lg bg-card">
-                  <div className="grid flex-1 gap-2 sm:grid-cols-2">
-                    <div className="space-y-1">
-                      <Label className="text-xs">Question</Label>
-                      <Input value={f.question} onChange={(e) => {
-                        const copy = [...faqs];
-                        copy[i].question = e.target.value;
-                        setFaqs(copy);
-                      }} />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Answer</Label>
-                      <Input value={f.answer} onChange={(e) => {
-                        const copy = [...faqs];
-                        copy[i].answer = e.target.value;
-                        setFaqs(copy);
-                      }} />
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="text-destructive mt-5" onClick={() => setFaqs(faqs.filter((_, idx) => idx !== i))}>
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="seo" className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label>Meta Title</Label>
-                <Input value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder="Search engine title override" />
-              </div>
-              <div className="space-y-2">
-                <Label>Meta Description</Label>
-                <Textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} rows={3} placeholder="Search engine description override" />
-              </div>
-            </TabsContent>
-          </Tabs>
+            </div>
+            <div className="space-y-2">
+              <Label>Hero Banner Image</Label>
+              <MediaUploader value={heroMediaUrl} onChange={(url, id) => { setHeroMediaUrl(url); if (id) setHeroMediaPublicId(id); }} onClear={() => { setHeroMediaUrl(""); setHeroMediaPublicId(""); }} />
+            </div>
+          </div>
 
           <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
