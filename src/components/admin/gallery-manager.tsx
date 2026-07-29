@@ -28,9 +28,10 @@ const GALLERY_CATEGORIES = [
 
 type Props = {
   items: any[];
+  projects: any[];
 };
 
-export function GalleryManager({ items }: Props) {
+export function GalleryManager({ items, projects }: Props) {
   const router = useRouter();
   const [selected, setSelected] = useState<any | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -48,6 +49,7 @@ export function GalleryManager({ items }: Props) {
   const [order, setOrder] = useState(0);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isPublished, setIsPublished] = useState(true);
+  const [projectId, setProjectId] = useState<string | null>(null);
 
   const handleOpenNew = () => {
     setSelected(null);
@@ -60,6 +62,7 @@ export function GalleryManager({ items }: Props) {
     setOrder(0);
     setIsFeatured(false);
     setIsPublished(true);
+    setProjectId(null);
     setIsOpen(true);
   };
 
@@ -74,6 +77,7 @@ export function GalleryManager({ items }: Props) {
     setOrder(item.order || 0);
     setIsFeatured(item.isFeatured || false);
     setIsPublished(item.isPublished !== undefined ? item.isPublished : item.isActive);
+    setProjectId(item.projectId || null);
     setIsOpen(true);
   };
 
@@ -93,6 +97,7 @@ export function GalleryManager({ items }: Props) {
         isPublished,
         isActive: isPublished,
         type: mediaType,
+        projectId,
       });
       if (!res.ok) throw new Error(res.error);
       toast.success("Gallery item saved.");
@@ -259,6 +264,23 @@ export function GalleryManager({ items }: Props) {
             <div className="space-y-2">
               <Label>Description (Optional)</Label>
               <Textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter details about this item..." />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Link to Project (Optional)</Label>
+              <Select value={projectId || "NONE"} onValueChange={(val) => setProjectId(val === "NONE" ? null : val)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="No project selected" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NONE">No Project</SelectItem>
+                  {projects.map((proj) => (
+                    <SelectItem key={proj.id} value={proj.id}>
+                      {proj.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-3 gap-4 pt-2">

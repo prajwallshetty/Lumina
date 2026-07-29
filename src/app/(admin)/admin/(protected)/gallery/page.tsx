@@ -6,7 +6,10 @@ import { db } from "@/lib/db";
 export const metadata: Metadata = { title: "Gallery" };
 
 export default async function AdminGalleryPage() {
-  const items = await db.galleryItem.findMany({ orderBy: { order: "asc" } });
+  const [items, projects] = await Promise.all([
+    db.galleryItem.findMany({ orderBy: { order: "asc" }, include: { project: true } }),
+    db.project.findMany({ select: { id: true, title: true } }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -14,7 +17,7 @@ export default async function AdminGalleryPage() {
         title="Gallery"
         description="Curate the public gallery grid. Upload assets from the Media Library."
       />
-      <GalleryManager items={items} />
+      <GalleryManager items={items} projects={projects} />
     </div>
   );
 }

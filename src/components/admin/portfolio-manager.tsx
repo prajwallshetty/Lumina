@@ -60,6 +60,8 @@ export function PortfolioManager({ projects, categories, designers }: Props) {
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [order, setOrder] = useState(0);
+  const [completionDate, setCompletionDate] = useState("");
+  const [servicesUsedInput, setServicesUsedInput] = useState("");
 
   // Relational lists
   const [images, setImages] = useState<any[]>([]);
@@ -90,6 +92,8 @@ export function PortfolioManager({ projects, categories, designers }: Props) {
     setMetaTitle("");
     setMetaDescription("");
     setOrder(0);
+    setCompletionDate("");
+    setServicesUsedInput("");
     setImages([]);
     setMaterials([]);
     setBeforeAfters([]);
@@ -120,7 +124,8 @@ export function PortfolioManager({ projects, categories, designers }: Props) {
     setMetaTitle(p.metaTitle || "");
     setMetaDescription(p.metaDescription || "");
     setOrder(p.order || 0);
-
+    setCompletionDate(p.completionDate || "");
+    setServicesUsedInput(p.servicesUsed?.join(", ") || "");
     setImages(p.images || []);
     setMaterials(p.materials || []);
     setBeforeAfters(p.beforeAfters || []);
@@ -170,6 +175,7 @@ export function PortfolioManager({ projects, categories, designers }: Props) {
     try {
       setLoading(true);
       const tags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
+      const servicesUsed = servicesUsedInput.split(",").map((s) => s.trim()).filter(Boolean);
       const res = await saveProject({
         id: selectedProject?.id,
         title,
@@ -183,6 +189,7 @@ export function PortfolioManager({ projects, categories, designers }: Props) {
         timeline,
         area,
         year,
+        completionDate,
         status: status as any,
         isFeatured,
         coverMediaUrl,
@@ -191,6 +198,7 @@ export function PortfolioManager({ projects, categories, designers }: Props) {
         videoPublicId,
         designerId: designerId || null,
         tags,
+        servicesUsed,
         metaTitle,
         metaDescription,
         order: Number(order),
@@ -429,10 +437,18 @@ export function PortfolioManager({ projects, categories, designers }: Props) {
                   <Label>Year</Label>
                   <Input value={year} onChange={(e) => setYear(e.target.value)} />
                 </div>
+                <div className="space-y-2">
+                  <Label>Completion Date</Label>
+                  <Input value={completionDate} onChange={(e) => setCompletionDate(e.target.value)} placeholder="e.g. October 2025" />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>Tags (Comma-separated)</Label>
                 <Input value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} placeholder="e.g. Luxury, Modern, Minimal" />
+              </div>
+              <div className="space-y-2">
+                <Label>Services Used (Comma-separated)</Label>
+                <Input value={servicesUsedInput} onChange={(e) => setServicesUsedInput(e.target.value)} placeholder="e.g. Turnkey Interiors, Space Planning" />
               </div>
             </TabsContent>
 

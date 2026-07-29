@@ -46,14 +46,26 @@ export function MediaContainer({
       )}
     >
       {src ? (
-        <Image
-          src={src}
-          alt={alt ?? label ?? ""}
-          fill
-          priority={priority}
-          sizes={sizes}
-          className="object-cover"
-        />
+        kind === "video" ? (
+          <video
+            src={src}
+            className="w-full h-full object-cover"
+            controls
+            muted
+            loop
+            autoPlay
+            playsInline
+          />
+        ) : (
+          <Image
+            src={src}
+            alt={alt ?? label ?? ""}
+            fill
+            priority={priority}
+            sizes={sizes}
+            className="object-cover"
+          />
+        )
       ) : (
         <div
           className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground"

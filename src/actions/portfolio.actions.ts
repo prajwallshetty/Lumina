@@ -44,6 +44,7 @@ const projectSchema = z.object({
   timeline: z.string().optional().nullable(),
   area: z.string().optional().nullable(),
   year: z.string().optional().nullable(),
+  completionDate: z.string().optional().nullable(),
   status: z.nativeEnum(ProjectStatus).default(ProjectStatus.DRAFT),
   isFeatured: z.boolean().default(false),
   coverMediaUrl: z.string().optional().nullable(),
@@ -52,6 +53,7 @@ const projectSchema = z.object({
   videoPublicId: z.string().optional().nullable(),
   designerId: z.string().optional().nullable(),
   tags: z.array(z.string()).default([]),
+  servicesUsed: z.array(z.string()).default([]),
   metaTitle: z.string().optional().nullable(),
   metaDescription: z.string().optional().nullable(),
   order: z.number().default(0),
@@ -76,6 +78,8 @@ export const saveProject = defineAction(
       timeline: input.timeline,
       area: input.area,
       year: input.year,
+      completionDate: input.completionDate,
+      servicesUsed: input.servicesUsed,
       status: input.status,
       isFeatured: input.isFeatured,
       coverMediaUrl: input.coverMediaUrl,
@@ -157,6 +161,7 @@ export const saveProject = defineAction(
 
     revalidatePath("/portfolio");
     revalidatePath(`/portfolio/${project.slug}`);
+    revalidatePath("/gallery");
     revalidatePath("/", "layout");
 
     return ok(project);
@@ -177,6 +182,7 @@ export const deleteProject = defineAction(
     });
 
     revalidatePath("/portfolio");
+    revalidatePath("/gallery");
     revalidatePath("/", "layout");
     return ok(null);
   }

@@ -32,6 +32,7 @@ const META_FIELDS = [
   ["Timeline", "timeline"],
   ["Area", "area"],
   ["Year", "year"],
+  ["Completion Date", "completionDate"],
 ] as const;
 
 export default async function ProjectDetailPage({ params }: Params) {
@@ -99,6 +100,20 @@ export default async function ProjectDetailPage({ params }: Params) {
               </div>
             )}
 
+            {/* Services Used */}
+            {project.servicesUsed && project.servicesUsed.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold tracking-[0.2em] text-[#6F6F6F] uppercase">Services Used</h4>
+                <div className="flex flex-wrap gap-2">
+                  {project.servicesUsed.map((service: string, idx: number) => (
+                    <Badge key={idx} variant="secondary" className="px-3 py-1 font-medium tracking-wide">
+                      {service}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Button asChild size="lg" className="w-full sm:w-auto font-semibold bg-[#111111] text-white hover:bg-accent tracking-wider rounded-full transition-colors duration-300">
               <Link href="/contact?intent=consultation">Start a Similar Project</Link>
             </Button>
@@ -123,6 +138,23 @@ export default async function ProjectDetailPage({ params }: Params) {
               <Reveal delay={0.1}>
                 <div className="prose max-w-none text-base sm:text-lg leading-relaxed text-muted-foreground border-l-2 border-accent/40 pl-6 py-1 whitespace-pre-line">
                   {project.description}
+                </div>
+              </Reveal>
+            )}
+
+            {/* Project Showcase Video */}
+            {project.videoUrl && (
+              <Reveal delay={0.15}>
+                <div className="space-y-4">
+                  <h3 className="font-heading text-2xl font-light tracking-wide text-foreground">Project Showcase Video</h3>
+                  <div className="overflow-hidden rounded-2xl border border-border shadow-md aspect-video relative bg-black">
+                    <video
+                      src={project.videoUrl}
+                      className="w-full h-full object-cover"
+                      controls
+                      playsInline
+                    />
+                  </div>
                 </div>
               </Reveal>
             )}

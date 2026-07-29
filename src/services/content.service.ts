@@ -32,7 +32,73 @@ export const getPublishedFaqs = cache(async () => {
 
 // Gallery
 export const getGalleryItems = cache(async () => {
-  return db.galleryItem.findMany({ where: { isActive: true }, orderBy: { order: "asc" } });
+  try {
+    const projects = await db.project.findMany({
+      where: { status: "PUBLISHED" },
+      include: {
+        category: true,
+        images: {
+          orderBy: { order: "asc" },
+          include: { media: true },
+        },
+      },
+    });
+
+    const standaloneItems = await db.galleryItem.findMany({
+      where: { isActive: true, isPublished: true },
+      include: {
+        project: {
+          include: { category: true },
+        },
+        media: true,
+      },
+      orderBy: { order: "asc" },
+    });
+
+    const portfolioItems = projects.flatMap((project) => {
+      return project.images.map((img) => ({
+        id: `project-image-${img.id}`,
+        title: img.alt || project.title,
+        description: project.summary || "",
+        category: project.category?.name || "General",
+        url: img.url || img.media?.secureUrl || img.media?.url || "",
+        type: img.media?.type || "IMAGE",
+        projectId: project.id,
+        isFeatured: project.isFeatured,
+        createdAt: project.createdAt,
+        tags: project.tags,
+        order: project.order * 100 + img.order,
+      }));
+    });
+
+    const standaloneMapped = standaloneItems.map((item) => ({
+      id: `gallery-item-${item.id}`,
+      title: item.title || item.project?.title || "Untitled",
+      description: item.description || item.project?.summary || "",
+      category: item.category || item.project?.category?.name || "General",
+      url: item.url || item.media?.secureUrl || item.media?.url || "",
+      type: item.type,
+      projectId: item.projectId,
+      isFeatured: item.isFeatured,
+      createdAt: item.createdAt || item.project?.createdAt || new Date(0),
+      tags: item.project?.tags || [],
+      order: item.order,
+    }));
+
+    const combined = [...portfolioItems, ...standaloneMapped];
+
+    return combined.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      if (dateB !== dateA) {
+        return dateB - dateA;
+      }
+      return a.order - b.order;
+    });
+  } catch (e) {
+    console.error("Error in getGalleryItems:", e);
+    return [];
+  }
 });
 
 // Before & After

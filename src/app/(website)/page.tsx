@@ -6,13 +6,15 @@ import { TestimonialsSection } from "@/components/website/home/testimonials-sect
 import { BottomCta } from "@/components/website/home/bottom-cta";
 import { getHomepageContent } from "@/services/homepage.service";
 import { getBeforeAfters, getPublishedTestimonials } from "@/services/content.service";
+import { getFeaturedProjects } from "@/services/portfolio.service";
 
 export default async function HomePage() {
   // Gracefully handle missing DATABASE_URL — all sections have built-in defaults.
-  const [home, beforeAfters, testimonials] = await Promise.all([
+  const [home, beforeAfters, testimonials, featuredProjects] = await Promise.all([
     getHomepageContent().catch(() => null),
     getBeforeAfters({ featuredOnly: true }).catch(() => []),
     getPublishedTestimonials({ featuredOnly: true, take: 6 }).catch(() => []),
+    getFeaturedProjects(4).catch(() => []),
   ]);
 
   return (
@@ -34,7 +36,7 @@ export default async function HomePage() {
         }
       />
 
-      <PortfolioGrid />
+      <PortfolioGrid projects={featuredProjects} />
 
       <BeforeAfterSection items={beforeAfters} />
 

@@ -15,51 +15,11 @@ type Project = {
   asymmetry: number[];
 };
 
-const PROJECTS: Project[] = [
-  {
-    id: "the-ivory-house",
-    num: "01",
-    title: "Masco Grandeur",
-    category: "RESIDENTIAL",
-    location: "BENGALURU, INDIA",
-    imageUrl:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop",
-    // 3 broad smooth waves
-    asymmetry: [1.12, 1.10, 0.96, 0.90, 0.94, 1.08, 1.12, 1.05, 0.94, 0.90, 0.95, 1.08, 1.12, 1.06, 0.95, 0.90],
-  },
-  {
-    id: "the-courtyard-villa",
-    num: "02",
-    title: "The Courtyard Villa",
-    category: "RESIDENTIAL",
-    location: "GOA, INDIA",
-    imageUrl:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
-    // 3 offset broad waves
-    asymmetry: [0.90, 1.05, 1.12, 1.08, 0.95, 0.90, 0.98, 1.10, 1.12, 1.04, 0.92, 0.90, 0.96, 1.08, 1.12, 0.98],
-  },
-  {
-    id: "the-calm-residence",
-    num: "03",
-    title: "The Calm Residence",
-    category: "RESIDENTIAL",
-    location: "PUNE, INDIA",
-    imageUrl:
-      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1000&auto=format&fit=crop",
-    // 4 smooth waves
-    asymmetry: [1.12, 0.98, 0.90, 1.02, 1.12, 1.00, 0.90, 0.98, 1.12, 1.02, 0.90, 0.96, 1.12, 0.98, 0.90, 1.02],
-  },
-  {
-    id: "the-oakline-retreat",
-    num: "04",
-    title: "The Oakline Retreat",
-    category: "HOSPITALITY",
-    location: "COORG, INDIA",
-    imageUrl:
-      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1000&auto=format&fit=crop",
-    // 3 smooth waves
-    asymmetry: [0.96, 1.12, 1.06, 0.92, 0.90, 1.04, 1.12, 1.00, 0.90, 0.95, 1.08, 1.12, 0.98, 0.90, 0.92, 1.04],
-  },
+const ASYMMETRIES = [
+  [1.12, 1.10, 0.96, 0.90, 0.94, 1.08, 1.12, 1.05, 0.94, 0.90, 0.95, 1.08, 1.12, 1.06, 0.95, 0.90],
+  [0.90, 1.05, 1.12, 1.08, 0.95, 0.90, 0.98, 1.10, 1.12, 1.04, 0.92, 0.90, 0.96, 1.08, 1.12, 0.98],
+  [1.12, 0.98, 0.90, 1.02, 1.12, 1.00, 0.90, 0.98, 1.12, 1.02, 0.90, 0.96, 1.12, 0.98, 0.90, 1.02],
+  [0.96, 1.12, 1.06, 0.92, 0.90, 1.04, 1.12, 1.00, 0.90, 0.95, 1.08, 1.12, 0.98, 0.90, 0.92, 1.04]
 ];
 
 const POINT_COUNT = 16;
@@ -67,7 +27,7 @@ const SVG_SIZE = 500;
 const CENTER = SVG_SIZE / 2;
 const BASE_RADIUS = 195;
 
-function BlobProjectCard({ project, index }: { project: Project; index: number }) {
+function BlobProjectCard({ project, index }: { project: any; index: number }) {
   const maskId = useId();
   const gradientId = useId();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -76,11 +36,11 @@ function BlobProjectCard({ project, index }: { project: Project; index: number }
   const pathDRef = useRef("");
 
   const currentRadiiRef = useRef<number[]>(
-    project.asymmetry.map((a) => BASE_RADIUS * a)
+    project.asymmetry.map((a: number) => BASE_RADIUS * a)
   );
   const velocityRef = useRef<number[]>(new Array(POINT_COUNT).fill(0));
   const targetRadiiRef = useRef<number[]>(
-    project.asymmetry.map((a) => BASE_RADIUS * a)
+    project.asymmetry.map((a: number) => BASE_RADIUS * a)
   );
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -253,8 +213,6 @@ function BlobProjectCard({ project, index }: { project: Project; index: number }
             >
               {project.num}
             </text>
-
-
           </svg>
         </div>
 
@@ -265,8 +223,8 @@ function BlobProjectCard({ project, index }: { project: Project; index: number }
               {project.title}
             </h3>
             <div className="flex items-center gap-3 mt-1.5 text-[10px] tracking-[0.18em] text-[#6F6F6F] font-semibold uppercase">
-              <span>{project.location}</span>
-              <span className="w-1 h-1 rounded-full bg-[#B79D89]" />
+              {project.location && <span>{project.location}</span>}
+              {project.location && project.category && <span className="w-1 h-1 rounded-full bg-[#B79D89]" />}
               <span>{project.category}</span>
             </div>
           </div>
@@ -281,7 +239,17 @@ function BlobProjectCard({ project, index }: { project: Project; index: number }
   );
 }
 
-export function PortfolioGrid() {
+export function PortfolioGrid({ projects = [] }: { projects?: any[] }) {
+  const mappedProjects = projects.map((p, idx) => ({
+    id: p.slug,
+    num: String(idx + 1).padStart(2, "0"),
+    title: p.title,
+    category: p.category?.name?.toUpperCase() || "RESIDENTIAL",
+    location: p.location?.toUpperCase() || "INDIA",
+    imageUrl: p.coverMediaUrl || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop",
+    asymmetry: ASYMMETRIES[idx % ASYMMETRIES.length],
+  }));
+
   return (
     <section className="py-24 sm:py-36 bg-[#FCFAF8] relative z-20 select-none overflow-hidden">
       <div className="max-w-[1480px] mx-auto px-6 sm:px-12 lg:px-16">
@@ -307,11 +275,15 @@ export function PortfolioGrid() {
         </div>
 
         {/* 4 Organic Sculptural Liquid Blob Cards in Asymmetrical Editorial Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-start max-w-[1100px] mx-auto">
-          {PROJECTS.map((project, idx) => (
-            <BlobProjectCard key={project.id} project={project} index={idx} />
-          ))}
-        </div>
+        {mappedProjects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-start max-w-[1100px] mx-auto">
+            {mappedProjects.map((project, idx) => (
+              <BlobProjectCard key={project.id} project={project} index={idx} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-muted-foreground py-10">Portfolio projects will appear here once created and featured in the CMS.</p>
+        )}
       </div>
     </section>
   );
