@@ -4,34 +4,50 @@ import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Quote } from "lucide-react";
 
-const TESTIMONIALS = [
+export type TestimonialItem = {
+  id?: string;
+  quote: string;
+  clientName: string;
+  company?: string | null;
+  designation?: string | null;
+  location?: string | null;
+  photoUrl?: string | null;
+};
+
+const DEFAULT_TESTIMONIALS: TestimonialItem[] = [
   {
+    id: "1",
     quote:
-      "Lumina Spaces transformed our architectural vision into a serene sanctuary. Their meticulous attention to sensory materials and quiet minimalism is unmatched in luxury design.",
-    name: "Rohan & Aditi",
-    role: "HOMEOWNERS — BENGALURU",
-    avatar:
+      "Lumina Spaces delivered our hospitality interiors with outstanding quality and professionalism. The execution exceeded our expectations, and every detail reflected exceptional craftsmanship.",
+    clientName: "V&RO Hospitality",
+    company: "V&RO Hospitality Group",
+    location: "BENGALURU",
+    photoUrl:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
   },
   {
+    id: "2",
     quote:
-      "A rare team that understands the poetry of light, space, and volume. From first sketch to final installation, the process was calm, transparent, and flawless.",
-    name: "Arjun Mehra",
-    role: "ENTREPRENEUR — MUMBAI",
-    avatar:
+      "Their project execution was seamless from planning to completion. The team maintained excellent communication and delivered everything on time.",
+    clientName: "Table Space Private Limited",
+    company: "Table Space",
+    location: "COMMERCIAL FIT-OUT",
+    photoUrl:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
   },
   {
+    id: "3",
     quote:
-      "The result exceeds every expectation. Walking into our home feels like walking through a private gallery. Timeless craftsmanship at its absolute peak.",
-    name: "Sneha Iyer",
-    role: "HOMEOWNER — PUNE",
-    avatar:
+      "An exceptional experience working with Lumina Spaces. Their creativity, attention to detail and execution quality truly transformed our space.",
+    clientName: "Cafe Noir",
+    company: "Cafe Noir",
+    location: "HOSPITALITY",
+    photoUrl:
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop",
   },
 ];
 
-function TestimonialCard({ t, index }: { t: typeof TESTIMONIALS[0]; index: number }) {
+function TestimonialCard({ t, index }: { t: TestimonialItem; index: number }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -51,6 +67,9 @@ function TestimonialCard({ t, index }: { t: typeof TESTIMONIALS[0]; index: numbe
     mouseX.set(0);
     mouseY.set(0);
   };
+
+  const avatarUrl = t.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop";
+  const label = t.company || t.designation || t.location || "CLIENT";
 
   return (
     <motion.div
@@ -86,16 +105,17 @@ function TestimonialCard({ t, index }: { t: typeof TESTIMONIALS[0]; index: numbe
         <div className="flex items-center gap-4 relative z-10 pt-6 border-t border-black/5">
           <div className="w-12 h-12 rounded-full overflow-hidden relative border border-black/10 shadow-xs">
             <Image
-              src={t.avatar}
-              alt={t.name}
+              src={avatarUrl}
+              alt={t.clientName}
               fill
               sizes="48px"
               className="object-cover"
+              unoptimized
             />
           </div>
           <div>
-            <h4 className="font-heading text-base font-semibold text-[#111111]">{t.name}</h4>
-            <p className="text-[10px] tracking-[0.18em] text-[#6F6F6F] font-semibold uppercase">{t.role}</p>
+            <h4 className="font-heading text-base font-semibold text-[#111111]">{t.clientName}</h4>
+            <p className="text-[10px] tracking-[0.18em] text-[#6F6F6F] font-semibold uppercase">{label}</p>
           </div>
         </div>
       </motion.div>
@@ -103,7 +123,9 @@ function TestimonialCard({ t, index }: { t: typeof TESTIMONIALS[0]; index: numbe
   );
 }
 
-export function TestimonialsSection() {
+export function TestimonialsSection({ items }: { items?: TestimonialItem[] }) {
+  const testimonialList = items && items.length > 0 ? items : DEFAULT_TESTIMONIALS;
+
   return (
     <section className="py-24 sm:py-36 bg-[#FCFAF8] relative z-20 select-none overflow-hidden">
       <div className="max-w-[1480px] mx-auto px-6 sm:px-12 lg:px-16">
@@ -123,8 +145,8 @@ export function TestimonialsSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-          {TESTIMONIALS.map((t, i) => (
-            <TestimonialCard key={t.name} t={t} index={i} />
+          {testimonialList.map((t, i) => (
+            <TestimonialCard key={t.id || t.clientName || i} t={t} index={i} />
           ))}
         </div>
       </div>

@@ -16,3 +16,9 @@ export async function loginAction(password: string) {
   }
   return { success: false, error: "Invalid password." };
 }
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete("lumina_admin_session");
+  return { success: true };
+}

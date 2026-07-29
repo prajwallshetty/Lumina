@@ -5,10 +5,15 @@ import { PhilosophySection } from "@/components/website/home/philosophy-section"
 import { TestimonialsSection } from "@/components/website/home/testimonials-section";
 import { BottomCta } from "@/components/website/home/bottom-cta";
 import { getHomepageContent } from "@/services/homepage.service";
+import { getBeforeAfters, getPublishedTestimonials } from "@/services/content.service";
 
 export default async function HomePage() {
   // Gracefully handle missing DATABASE_URL — all sections have built-in defaults.
-  const home = await getHomepageContent().catch(() => null);
+  const [home, beforeAfters, testimonials] = await Promise.all([
+    getHomepageContent().catch(() => null),
+    getBeforeAfters({ featuredOnly: true }).catch(() => []),
+    getPublishedTestimonials({ featuredOnly: true, take: 6 }).catch(() => []),
+  ]);
 
   return (
     <>
@@ -31,11 +36,11 @@ export default async function HomePage() {
 
       <PortfolioGrid />
 
-      <BeforeAfterSection />
+      <BeforeAfterSection items={beforeAfters} />
 
       <PhilosophySection />
 
-      <TestimonialsSection />
+      <TestimonialsSection items={testimonials} />
 
       <BottomCta />
     </>

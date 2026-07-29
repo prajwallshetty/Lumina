@@ -6,12 +6,12 @@ import { getAboutContent } from "@/services/content.service";
 export const metadata: Metadata = { title: "About CMS" };
 
 export default async function AdminAboutPage() {
-  const { content, timeline, team, certificates } = await getAboutContent();
+  const { content } = await getAboutContent();
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="About" description="Story, mission, founder, team, timeline and certificates." />
-      <AboutManager content={content} timeline={timeline} team={team} certificates={certificates} />
+      <AdminPageHeader title="About" description="Manage company story, experience, vision, mission and founder message." />
+      <AboutManager content={content} />
     </div>
   );
 }

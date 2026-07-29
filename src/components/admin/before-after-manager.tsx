@@ -78,6 +78,7 @@ export function BeforeAfterManager({ items }: Props) {
         afterUrl,
         afterPublicId,
         isFeatured,
+        isPublished: true,
         order: Number(order),
       });
       if (!res.ok) throw new Error(res.error);

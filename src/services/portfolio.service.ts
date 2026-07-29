@@ -24,7 +24,7 @@ export type FallbackProject = {
   designer: { id: string; name: string; jobTitle: string | null; image: string | null } | null;
   images: Array<{ id: string; url: string | null; alt: string | null; media?: { secureUrl?: string | null } | null }>;
   materials: Array<{ id: string; name: string; detail: string | null }>;
-  beforeAfters: Array<{ id: string; beforeUrl: string | null; afterUrl: string | null; title: string }>;
+  beforeAfters: Array<{ id: string; beforeUrl: string | null; afterUrl: string | null; title: string; caption?: string | null }>;
 };
 
 const FALLBACK_PROJECTS: Record<string, FallbackProject> = {

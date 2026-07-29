@@ -15,9 +15,9 @@ const SVG_HEIGHT = 1125; // 16:10 to match the container aspect ratio below
 const CENTER_X = SVG_WIDTH / 2;
 const CENTER_Y = SVG_HEIGHT / 2;
 
-// Base radii sized proportionally for the 16:10 canvas - spacious & prominent
-const BASE_RADIUS_X = 810;
-const BASE_RADIUS_Y = 480;
+// Base radii sized proportionally for the 16:10 canvas - safely within boundaries to prevent edge clipping
+const BASE_RADIUS_X = 580;
+const BASE_RADIUS_Y = 350;
 
 // Portfolio 01 ("The Ivory House") organic liquid blob asymmetry mapping
 const ASYMMETRY = [
@@ -86,9 +86,8 @@ export function LiquidBlob({ videoUrl = LUXURY_INTERIOR_VIDEO }: LiquidBlobProps
     const dy = clientY - cY;
     const pointerAngle = Math.atan2(dy, dx);
     const distFromCenter = Math.hypot(dx, dy);
-    // Wider, stronger reach: saturates further out and pulls harder near it,
-    // so the field feels magnetic rather than a small local nudge.
-    const distRatio = Math.min(distFromCenter / (rect.width / 2), 1.6);
+    // Limit pull reach and drift factor to prevent any clipping on margins
+    const distRatio = Math.min(distFromCenter / (rect.width / 2), 1.0);
 
     for (let i = 0; i < POINT_COUNT; i++) {
       const pointAngle = (i * 2 * Math.PI) / POINT_COUNT;
@@ -96,13 +95,13 @@ export function LiquidBlob({ videoUrl = LUXURY_INTERIOR_VIDEO }: LiquidBlobProps
       if (diff > Math.PI) diff = 2 * Math.PI - diff;
 
       const pullFactor = Math.exp(-Math.pow(diff / 0.95, 2));
-      const pullOffset = pullFactor * 0.34 * distRatio;
+      const pullOffset = pullFactor * 0.16 * distRatio;
 
       targetFactorsRef.current[i] = ASYMMETRY[i] + pullOffset;
     }
 
-    // The whole silhouette leans toward the cursor with a strong magnetic pull
-    const maxDrift = 0.14;
+    // The whole silhouette leans toward the cursor with a limited pull
+    const maxDrift = 0.06;
     const driftStrength = Math.min(distFromCenter / (rect.width / 2), 1) * maxDrift;
     const norm = distFromCenter || 1;
     targetCenterOffsetRef.current = {
@@ -181,7 +180,8 @@ export function LiquidBlob({ videoUrl = LUXURY_INTERIOR_VIDEO }: LiquidBlobProps
         const phaseShift = (i * 2 * Math.PI) / POINT_COUNT;
         const waveA = Math.sin((elapsed * 2 * Math.PI) / WOBBLE_PERIOD_A + phaseShift);
         const waveB = Math.sin((elapsed * 2 * Math.PI) / WOBBLE_PERIOD_B - phaseShift * 1.7);
-        const idleOffset = (waveA * 0.7 + waveB * 0.3) * idleAmplitude;
+        const waveC = Math.cos((elapsed * 2 * Math.PI) / 5.2 + phaseShift * 2.3);
+        const idleOffset = (waveA * 0.5 + waveB * 0.3 + waveC * 0.2) * idleAmplitude;
 
         // Pulse briefly pinches alternating points in and out for a snappy
         // squeeze rather than a uniform inflate/deflate.
@@ -267,7 +267,7 @@ export function LiquidBlob({ videoUrl = LUXURY_INTERIOR_VIDEO }: LiquidBlobProps
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
       onPointerDown={handlePointerDown}
-      className="relative w-full aspect-[16/10] max-w-[1700px] xl:max-w-[2000px] 2xl:max-w-[2300px] max-h-[88vh] mx-auto flex items-center justify-center select-none cursor-pointer"
+      className={`relative w-full aspect-[16/10] max-w-[1700px] xl:max-w-[2000px] 2xl:max-w-[2300px] max-h-[88vh] mx-auto flex items-center justify-center select-none cursor-pointer liquid-blob-container-${rawId}`}
     >
       {/* Soft Ambient Shadow behind Blob */}
       <div
@@ -356,16 +356,28 @@ export function LiquidBlob({ videoUrl = LUXURY_INTERIOR_VIDEO }: LiquidBlobProps
       </svg>
 
       <style>{`
+        .liquid-blob-container-${rawId} {
+          animation: liquid-blob-float-${rawId} 18s ease-in-out infinite;
+        }
         .liquid-blob-video-${rawId} {
           transition: transform 700ms ease-out;
-          animation: liquid-blob-drift-${rawId} 16s ease-in-out infinite;
+          animation: liquid-blob-drift-${rawId} 20s ease-in-out infinite;
+        }
+        @keyframes liquid-blob-float-${rawId} {
+          0%   { transform: translateY(0px) rotate(0deg); }
+          33%  { transform: translateY(-8px) translateX(4px) rotate(0.4deg); }
+          66%  { transform: translateY(6px) translateX(-4px) rotate(-0.4deg); }
+          100% { transform: translateY(0px) rotate(0deg); }
         }
         @keyframes liquid-blob-drift-${rawId} {
           0%   { transform: scale(1.04) translate(0, 0); }
-          50%  { transform: scale(1.11) translate(-1.5%, -1.5%); }
+          50%  { transform: scale(1.10) translate(-1.2%, -1.2%); }
           100% { transform: scale(1.04) translate(0, 0); }
         }
         @media (prefers-reduced-motion: reduce) {
+          .liquid-blob-container-${rawId} {
+            animation: none;
+          }
           .liquid-blob-video-${rawId} {
             animation: none;
             transform: scale(1.04);

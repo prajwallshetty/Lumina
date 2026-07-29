@@ -14,6 +14,8 @@ export const metadata: Metadata = buildMetadata({
 
 type Search = { searchParams: Promise<{ service?: string; intent?: string }> };
 
+import { OfficeMaps } from "@/components/website/office-maps";
+
 export default async function ContactPage({ searchParams }: Search) {
   const { service } = await searchParams;
   const settings = await getSiteSettings().catch(() => null);
@@ -47,25 +49,10 @@ export default async function ContactPage({ searchParams }: Search) {
                 <MessageCircle className="h-5 w-5 text-accent" /> WhatsApp us
               </a>
             )}
-            {(settings?.addressLine || settings?.city) && (
-              <p className="flex items-start gap-3 text-sm">
-                <MapPin className="h-5 w-5 shrink-0 text-accent" />
-                <span>{[settings?.addressLine, settings?.city].filter(Boolean).join(", ")}</span>
-              </p>
-            )}
           </div>
 
-          <div className="mt-10">
-            {settings?.mapEmbedUrl ? (
-              <iframe
-                src={settings.mapEmbedUrl}
-                title="Studio location"
-                className="h-64 w-full rounded-xl border border-border"
-                loading="lazy"
-              />
-            ) : (
-              <MediaContainer src={null} label="Map" aspect="aspect-[16/9]" />
-            )}
+          <div className="mt-10 pt-6 border-t border-border">
+            <OfficeMaps />
           </div>
         </div>
 

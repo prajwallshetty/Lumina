@@ -16,6 +16,31 @@ export type SessionUser = {
 import { cookies } from "next/headers";
 import { db } from "./db";
 
+async function runWithRetry<T>(fn: () => Promise<T>, retries = 3, delay = 2000): Promise<T> {
+  let lastError: any;
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      const isConnectionError =
+        error.code === "P1001" ||
+        error.code === "P1008" ||
+        error.code === "P1017" ||
+        error.message?.includes("Can't reach database server") ||
+        error.message?.includes("timeout");
+      
+      if (isConnectionError && i < retries - 1) {
+        console.warn(`Database connection failed (attempt ${i + 1}/${retries}). Retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw lastError;
+}
+
 /** Read the current session (deduped per request). Returns null when signed out. */
 export const getSession = cache(async () => {
   // Check custom password-only session cookie first
@@ -24,9 +49,11 @@ export const getSession = cache(async () => {
     const adminSession = cookieStore.get("lumina_admin_session")?.value;
     
     if (adminSession === "authenticated") {
-      const dbUser = await db.user.findFirst({
-        where: { role: "SUPER_ADMIN", isActive: true },
-      });
+      const dbUser = await runWithRetry(() => 
+        db.user.findFirst({
+          where: { role: "SUPER_ADMIN", isActive: true },
+        })
+      );
       if (dbUser) {
         return {
           user: {

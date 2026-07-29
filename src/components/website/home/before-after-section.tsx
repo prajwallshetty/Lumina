@@ -3,12 +3,10 @@
 import { useEffect, useRef, useState, useId } from "react";
 import { motion } from "framer-motion";
 
-// Pencil sketch image (architectural presentation style)
-const SKETCH_IMAGE =
+const DEFAULT_SKETCH_IMAGE =
   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1400&auto=format&fit=crop&sat=-100&con=30";
 
-// Completed luxury photograph image
-const COMPLETED_IMAGE =
+const DEFAULT_COMPLETED_IMAGE =
   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1400&auto=format&fit=crop";
 
 const POINT_COUNT = 24;
@@ -20,7 +18,21 @@ const CENTER_Y = SVG_HEIGHT / 2;
 const RECT_W = 760; // Half-width of the idle rectangle in SVG space
 const RECT_H = 410; // Half-height of the idle rectangle in SVG space
 
-export function BeforeAfterSection() {
+export type TransformationItem = {
+  id?: string;
+  title: string;
+  caption?: string | null;
+  sketchUrl?: string | null;
+  beforeUrl?: string | null;
+  afterUrl?: string | null;
+};
+
+export function BeforeAfterSection({ items }: { items?: TransformationItem[] }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeItem = items && items.length > 0 ? items[activeIndex] : null;
+
+  const sketchImage = activeItem?.sketchUrl || activeItem?.beforeUrl || DEFAULT_SKETCH_IMAGE;
+  const completedImage = activeItem?.afterUrl || DEFAULT_COMPLETED_IMAGE;
   const maskId = useId();
   const revealMaskId = useId();
   const gradientId = useId();
@@ -283,7 +295,7 @@ export function BeforeAfterSection() {
             <g clipPath={`url(#${maskId})`}>
               {/* Base layer: black & white sketch image */}
               <image
-                href={SKETCH_IMAGE}
+                href={sketchImage}
                 width={SVG_WIDTH}
                 height={SVG_HEIGHT}
                 preserveAspectRatio="xMidYMid slice"
@@ -300,7 +312,7 @@ export function BeforeAfterSection() {
 
               {/* Top layer: color photograph image revealed by mask */}
               <image
-                href={COMPLETED_IMAGE}
+                href={completedImage}
                 width={SVG_WIDTH}
                 height={SVG_HEIGHT}
                 preserveAspectRatio="xMidYMid slice"

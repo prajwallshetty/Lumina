@@ -60,7 +60,7 @@ const statSchema = z.object({
 
 export const saveStat = defineAction(
   { input: statSchema, roles: ["SUPER_ADMIN", "ADMIN"], permission: "homepage.update" },
-  async ({ input, ctx }) => {
+  async ({ input }) => {
     const isNew = !input.id;
     const data = {
       label: input.label,
@@ -94,8 +94,14 @@ export const deleteStat = defineAction(
 const aboutSchema = z.object({
   storyTitle: z.string().optional().nullable(),
   storyBody: z.string().optional().nullable(),
-  mission: z.string().optional().nullable(),
+  experienceText: z.string().optional().nullable(),
+  yearsOfExperienceCount: z.string().optional().nullable(),
+  completedProjectsCount: z.string().optional().nullable(),
+  clientSatisfactionCount: z.string().optional().nullable(),
+  visionTitle: z.string().optional().nullable(),
   vision: z.string().optional().nullable(),
+  missionTitle: z.string().optional().nullable(),
+  mission: z.string().optional().nullable(),
   founderName: z.string().optional().nullable(),
   founderRole: z.string().optional().nullable(),
   founderMessage: z.string().optional().nullable(),
@@ -124,141 +130,12 @@ export const updateAboutContent = defineAction(
   }
 );
 
-// Timeline actions
-const timelineEventSchema = z.object({
-  id: z.string().optional(),
-  year: z.string().min(1, "Year is required"),
-  title: z.string().min(1, "Title is required"),
-  body: z.string().optional().nullable(),
-  order: z.number().default(0),
-});
-
-export const saveTimelineEvent = defineAction(
-  { input: timelineEventSchema, roles: ["SUPER_ADMIN", "ADMIN"], permission: "about.update" },
-  async ({ input }) => {
-    const isNew = !input.id;
-    const data = { year: input.year, title: input.title, body: input.body, order: input.order };
-
-    let event;
-    if (isNew) {
-      event = await db.timelineEvent.create({ data });
-    } else {
-      event = await db.timelineEvent.update({ where: { id: input.id }, data });
-    }
-
-    revalidatePath("/about");
-    return ok(event);
-  }
-);
-
-export const deleteTimelineEvent = defineAction(
-  { input: z.object({ id: z.string() }), roles: ["SUPER_ADMIN", "ADMIN"], permission: "about.update" },
-  async ({ input }) => {
-    await db.timelineEvent.delete({ where: { id: input.id } });
-    revalidatePath("/about");
-    return ok(null);
-  }
-);
-
-// Team actions
-const teamMemberSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(1, "Name is required"),
-  role: z.string().min(1, "Role is required"),
-  bio: z.string().optional().nullable(),
-  photoUrl: z.string().optional().nullable(),
-  photoPublicId: z.string().optional().nullable(),
-  linkedinUrl: z.string().optional().nullable(),
-  order: z.number().default(0),
-  isActive: z.boolean().default(true),
-});
-
-export const saveTeamMember = defineAction(
-  { input: teamMemberSchema, roles: ["SUPER_ADMIN", "ADMIN"], permission: "about.update" },
-  async ({ input }) => {
-    const isNew = !input.id;
-    const data = {
-      name: input.name,
-      role: input.role,
-      bio: input.bio,
-      photoUrl: input.photoUrl,
-      photoPublicId: input.photoPublicId,
-      linkedinUrl: input.linkedinUrl,
-      order: input.order,
-      isActive: input.isActive,
-    };
-
-    let member;
-    if (isNew) {
-      member = await db.teamMember.create({ data });
-    } else {
-      member = await db.teamMember.update({ where: { id: input.id }, data });
-    }
-
-    revalidatePath("/about");
-    return ok(member);
-  }
-);
-
-export const deleteTeamMember = defineAction(
-  { input: z.object({ id: z.string() }), roles: ["SUPER_ADMIN", "ADMIN"], permission: "about.update" },
-  async ({ input }) => {
-    await db.teamMember.delete({ where: { id: input.id } });
-    revalidatePath("/about");
-    return ok(null);
-  }
-);
-
-// Certificate / Awards actions
-const certificateSchema = z.object({
-  id: z.string().optional(),
-  title: z.string().min(1, "Title is required"),
-  issuer: z.string().optional().nullable(),
-  year: z.string().optional().nullable(),
-  imageUrl: z.string().optional().nullable(),
-  imagePublicId: z.string().optional().nullable(),
-  order: z.number().default(0),
-});
-
-export const saveCertificate = defineAction(
-  { input: certificateSchema, roles: ["SUPER_ADMIN", "ADMIN"], permission: "about.update" },
-  async ({ input }) => {
-    const isNew = !input.id;
-    const data = {
-      title: input.title,
-      issuer: input.issuer,
-      year: input.year,
-      imageUrl: input.imageUrl,
-      imagePublicId: input.imagePublicId,
-      order: input.order,
-    };
-
-    let cert;
-    if (isNew) {
-      cert = await db.certificate.create({ data });
-    } else {
-      cert = await db.certificate.update({ where: { id: input.id }, data });
-    }
-
-    revalidatePath("/about");
-    return ok(cert);
-  }
-);
-
-export const deleteCertificate = defineAction(
-  { input: z.object({ id: z.string() }), roles: ["SUPER_ADMIN", "ADMIN"], permission: "about.update" },
-  async ({ input }) => {
-    await db.certificate.delete({ where: { id: input.id } });
-    revalidatePath("/about");
-    return ok(null);
-  }
-);
-
 // --- Testimonials actions ---
 const testimonialSchema = z.object({
   id: z.string().optional(),
   clientName: z.string().min(1, "Client Name is required"),
   company: z.string().optional().nullable(),
+  designation: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   rating: z.number().min(1).max(5).default(5),
   quote: z.string().min(1, "Quote is required"),
@@ -278,6 +155,7 @@ export const saveTestimonial = defineAction(
     const data = {
       clientName: input.clientName,
       company: input.company,
+      designation: input.designation,
       location: input.location,
       rating: input.rating,
       quote: input.quote,
@@ -401,9 +279,14 @@ const jobPostingSchema = z.object({
   department: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   type: z.nativeEnum(JobType).default(JobType.FULL_TIME),
+  experience: z.string().optional().nullable(),
+  salary: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
+  responsibilities: z.string().optional().nullable(),
   requirements: z.string().optional().nullable(),
+  benefits: z.string().optional().nullable(),
   isOpen: z.boolean().default(true),
+  isPublished: z.boolean().optional().default(true),
 });
 
 export const saveJobPosting = defineAction(
@@ -416,9 +299,14 @@ export const saveJobPosting = defineAction(
       department: input.department,
       location: input.location,
       type: input.type,
+      experience: input.experience,
+      salary: input.salary,
       description: input.description,
+      responsibilities: input.responsibilities,
       requirements: input.requirements,
+      benefits: input.benefits,
       isOpen: input.isOpen,
+      isPublished: input.isPublished ?? true,
     };
 
     let job;
@@ -447,10 +335,14 @@ export const deleteJobPosting = defineAction(
 const gallerySchema = z.object({
   id: z.string().optional(),
   title: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
   url: z.string().min(1, "URL is required"),
   publicId: z.string().optional().nullable(),
   type: z.nativeEnum(MediaType).default(MediaType.IMAGE),
+  projectId: z.string().optional().nullable(),
+  isFeatured: z.boolean().default(false),
+  isPublished: z.boolean().optional().default(true),
   order: z.number().default(0),
   isActive: z.boolean().default(true),
 });
@@ -461,10 +353,14 @@ export const saveGalleryItem = defineAction(
     const isNew = !input.id;
     const data = {
       title: input.title,
+      description: input.description,
       category: input.category,
       url: input.url,
       publicId: input.publicId,
       type: input.type,
+      projectId: input.projectId || null,
+      isFeatured: input.isFeatured,
+      isPublished: input.isPublished ?? true,
       order: input.order,
       isActive: input.isActive,
     };
@@ -477,6 +373,7 @@ export const saveGalleryItem = defineAction(
     }
 
     revalidatePath("/gallery");
+    revalidatePath("/");
     return ok(item);
   }
 );
@@ -486,6 +383,7 @@ export const deleteGalleryItem = defineAction(
   async ({ input }) => {
     await db.galleryItem.delete({ where: { id: input.id } });
     revalidatePath("/gallery");
+    revalidatePath("/");
     return ok(null);
   }
 );
@@ -495,11 +393,15 @@ const beforeAfterGeneralSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "Title required"),
   caption: z.string().optional().nullable(),
+  sketchUrl: z.string().optional().nullable(),
+  sketchPublicId: z.string().optional().nullable(),
   beforeUrl: z.string().min(1, "Before Image is required"),
   beforePublicId: z.string().optional().nullable(),
   afterUrl: z.string().min(1, "After Image is required"),
   afterPublicId: z.string().optional().nullable(),
+  projectId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false),
+  isPublished: z.boolean().optional().default(true),
   order: z.number().default(0),
 });
 
@@ -510,11 +412,15 @@ export const saveBeforeAfter = defineAction(
     const data = {
       title: input.title,
       caption: input.caption,
+      sketchUrl: input.sketchUrl,
+      sketchPublicId: input.sketchPublicId,
       beforeUrl: input.beforeUrl,
       beforePublicId: input.beforePublicId,
       afterUrl: input.afterUrl,
       afterPublicId: input.afterPublicId,
+      projectId: input.projectId || null,
       isFeatured: input.isFeatured,
+      isPublished: input.isPublished ?? true,
       order: input.order,
     };
 

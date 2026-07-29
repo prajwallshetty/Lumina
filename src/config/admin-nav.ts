@@ -21,6 +21,7 @@ import {
   ScrollText,
   Mail,
   Menu,
+  Building2,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -44,6 +45,7 @@ export const adminNav: AdminNavItem[] = [
   { label: "Gallery", href: "/admin/gallery", icon: Images, group: "Content" },
   { label: "Before & After", href: "/admin/before-after", icon: ArrowLeftRight, group: "Content" },
   { label: "Testimonials", href: "/admin/testimonials", icon: Quote, group: "Content" },
+  { label: "Clients", href: "/admin/clients", icon: Building2, group: "Content" },
   { label: "Blog", href: "/admin/blog", icon: Newspaper, group: "Content" },
   { label: "FAQs", href: "/admin/faqs", icon: HelpCircle, group: "Content" },
   { label: "Careers", href: "/admin/careers", icon: Briefcase, group: "Content" },

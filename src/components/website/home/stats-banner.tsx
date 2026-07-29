@@ -4,9 +4,8 @@ import { motion } from "framer-motion";
 
 const stats = [
   { value: "150+", label: "Projects Completed" },
-  { value: "12+", label: "Years Experience" },
+  { value: "8+", label: "Years Experience" },
   { value: "95%", label: "Client Retention" },
-  { value: "25+", label: "Design Awards" },
   { value: "Bespoke", label: "Crafted for You", isItalicSerif: true },
 ];
 
@@ -14,7 +13,7 @@ export function StatsBanner() {
   return (
     <div className="w-full bg-transparent pt-10 pb-16 sm:pt-14 sm:pb-20 relative z-20">
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-16">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-black/[0.06]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-black/[0.06]">
           {stats.map((item, idx) => (
             <motion.div
               key={item.label}

@@ -350,8 +350,17 @@ model AboutContent {
   id           String  @id @default("singleton")
   storyTitle   String?
   storyBody    String? @db.Text
+  missionTitle String?
   mission      String? @db.Text
+  visionTitle  String?
   vision       String? @db.Text
+  experienceText          String? @db.Text
+  yearsOfExperienceCount  String?
+  completedProjectsCount String?
+  clientSatisfactionCount String?
+  industryExperienceText String?  @db.Text
+  coreValues              Json?
+  achievements            Json?
   // Founder slot
   founderName    String?
   founderRole    String?
@@ -364,42 +373,6 @@ model AboutContent {
   updatedAt DateTime @updatedAt
 
   @@map("about_content")
-}
-
-model TimelineEvent {
-  id        String  @id @default(cuid())
-  year      String
-  title     String
-  body      String? @db.Text
-  order     Int     @default(0)
-
-  @@map("timeline_events")
-}
-
-model TeamMember {
-  id         String  @id @default(cuid())
-  name       String
-  role       String
-  bio        String? @db.Text
-  photoUrl      String?
-  photoPublicId String?
-  linkedinUrl String?
-  order      Int     @default(0)
-  isActive   Boolean @default(true)
-
-  @@map("team_members")
-}
-
-model Certificate {
-  id        String  @id @default(cuid())
-  title     String
-  issuer    String?
-  year      String?
-  imageUrl      String?
-  imagePublicId String?
-  order     Int     @default(0)
-
-  @@map("certificates")
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -492,6 +465,11 @@ model Project {
   timeline    String?
   area        String? // e.g. "2,400 sq ft"
   year        String?
+  projectType String?
+  completionDate String?
+  sketchImageUrl String?
+  beforeImageUrl String?
+  afterImageUrl  String?
   status      ProjectStatus @default(DRAFT)
   isFeatured  Boolean       @default(false)
   // Cover slot
@@ -515,6 +493,7 @@ model Project {
   images      ProjectImage[]
   materials   ProjectMaterial[]
   beforeAfters BeforeAfter[]
+  galleryItems GalleryItem[]
 
   @@index([slug])
   @@index([status])
@@ -554,6 +533,8 @@ model BeforeAfter {
   id        String  @id @default(cuid())
   title     String
   caption   String? @db.Text
+  sketchUrl      String?
+  sketchPublicId String?
   beforeUrl      String?
   beforePublicId String?
   afterUrl       String?
@@ -561,6 +542,7 @@ model BeforeAfter {
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
   isFeatured Boolean @default(false)
+  isPublished Boolean @default(true)
   order     Int     @default(0)
   createdAt DateTime @default(now())
 
@@ -573,17 +555,25 @@ model BeforeAfter {
 // ═════════════════════════════════════════════════════════════════════════════
 
 model GalleryItem {
-  id        String    @id @default(cuid())
-  title     String?
-  category  String?
-  mediaId   String?
-  media     Media?    @relation(fields: [mediaId], references: [id], onDelete: SetNull)
-  url       String?
-  publicId  String?
-  type      MediaType @default(IMAGE)
-  order     Int       @default(0)
-  isActive  Boolean   @default(true)
+  id          String    @id @default(cuid())
+  title       String?
+  description String?   @db.Text
+  category    String?
+  mediaId     String?
+  media       Media?    @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  url         String?
+  publicId    String?
+  type        MediaType @default(IMAGE)
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  isFeatured  Boolean   @default(false)
+  isPublished Boolean   @default(true)
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
 
+  @@index([projectId])
+  @@index([category])
+  @@index([isPublished])
   @@map("gallery_items")
 }
 
@@ -595,6 +585,7 @@ model Testimonial {
   id          String  @id @default(cuid())
   clientName  String
   company     String?
+  designation String?
   location    String?
   rating      Int     @default(5)
   quote       String  @db.Text
@@ -630,13 +621,14 @@ model Review {
 // ═════════════════════════════════════════════════════════════════════════════
 
 model Brand {
-  id        String  @id @default(cuid())
-  name      String
-  websiteUrl String?
-  logoUrl      String?
+  id          String  @id @default(cuid())
+  name        String
+  websiteUrl  String?
+  logoUrl     String?
   logoPublicId String?
-  order     Int     @default(0)
-  isActive  Boolean @default(true)
+  description String? @db.Text
+  order       Int     @default(0)
+  isActive    Boolean @default(true)
 
   @@map("brands")
 }
@@ -749,16 +741,21 @@ enum JobType {
 }
 
 model JobPosting {
-  id          String    @id @default(cuid())
-  title       String
-  slug        String    @unique
-  department  String?
-  location    String?
-  type        JobType   @default(FULL_TIME)
-  description String?   @db.Text
-  requirements String?  @db.Text
-  isOpen      Boolean   @default(true)
-  createdAt   DateTime  @default(now())
+  id           String    @id @default(cuid())
+  title        String
+  slug         String    @unique
+  department   String?
+  location     String?
+  type         JobType   @default(FULL_TIME)
+  experience   String?
+  salary       String?
+  description  String?   @db.Text
+  responsibilities String? @db.Text
+  requirements String?   @db.Text
+  benefits     String?   @db.Text
+  isOpen       Boolean   @default(true)
+  isPublished  Boolean   @default(true)
+  createdAt    DateTime  @default(now())
 
   applications JobApplication[]
 

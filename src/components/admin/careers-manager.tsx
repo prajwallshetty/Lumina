@@ -78,6 +78,7 @@ export function CareersManager({ jobs }: Props) {
         description,
         requirements,
         isOpen: isOpenPosition,
+        isPublished: true,
       });
       if (!res.ok) throw new Error(res.error);
       toast.success("Job posting saved successfully.");

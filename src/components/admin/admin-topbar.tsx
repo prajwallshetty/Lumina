@@ -18,12 +18,13 @@ import { authClient } from "@/lib/auth-client";
 import { ROLE_LABELS } from "@/lib/rbac";
 import { initials } from "@/utils";
 import type { SessionUser } from "@/lib/session";
+import { logoutAction } from "@/app/actions/auth";
 
 export function AdminTopbar({ user }: { user: SessionUser }) {
   const router = useRouter();
 
   const onSignOut = async () => {
-    document.cookie = "lumina_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    await logoutAction().catch(() => {});
     await authClient.signOut().catch(() => {});
     router.push("/admin/sign-in");
     router.refresh();

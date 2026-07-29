@@ -4,13 +4,8 @@ import { db } from "@/lib/db";
 
 // About
 export const getAboutContent = cache(async () => {
-  const [content, timeline, team, certificates] = await Promise.all([
-    db.aboutContent.upsert({ where: { id: "singleton" }, update: {}, create: { id: "singleton" } }),
-    db.timelineEvent.findMany({ orderBy: { order: "asc" } }),
-    db.teamMember.findMany({ where: { isActive: true }, orderBy: { order: "asc" } }),
-    db.certificate.findMany({ orderBy: { order: "asc" } }),
-  ]);
-  return { content, timeline, team, certificates };
+  const content = await db.aboutContent.upsert({ where: { id: "singleton" }, update: {}, create: { id: "singleton" } });
+  return { content };
 });
 
 // Testimonials & reviews

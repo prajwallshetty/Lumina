@@ -12,7 +12,7 @@ export function AdminSidebar({ role }: { role: UserRole }) {
   const visible = adminNav.filter((item) => !item.roles || item.roles.includes(role));
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card lg:flex">
+    <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card lg:flex sticky top-0 h-screen">
       <div className="flex h-16 items-center border-b border-border px-6">
         <Logo href="/admin" />
       </div>
