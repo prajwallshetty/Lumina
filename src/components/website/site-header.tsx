@@ -20,6 +20,7 @@ const navItems: HeaderNavProps[] = [
   { label: "Services", href: "/services" },
   { label: "About", href: "/about" },
   { label: "Process", href: "/#process" },
+  { label: "Testimonials", href: "/testimonials" },
   { label: "Journal", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];

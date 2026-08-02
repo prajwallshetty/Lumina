@@ -13,9 +13,9 @@ export default async function ProtectedAdminLayout({
   const user = await requireUser();
 
   return (
-    <div className="flex min-h-dvh bg-secondary/30">
+    <div className="flex h-screen overflow-hidden bg-secondary/30">
       <AdminSidebar role={user.role} />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
         <AdminTopbar user={user} />
         <main className="flex-1 p-4 md:p-8">
           <div className="mx-auto w-full max-w-7xl">{children}</div>

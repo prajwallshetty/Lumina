@@ -34,6 +34,24 @@ export function HomepageForm({ home }: Props) {
   const [heroMediaPublicId, setHeroMediaPublicId] = useState(home.heroMediaPublicId || "");
   const [heroMediaType, setHeroMediaType] = useState(home.heroMediaType || "IMAGE");
 
+  const [heroVideos, setHeroVideos] = useState<string[]>(
+    home.heroMediaType === "VIDEO" && home.heroMediaUrl
+      ? home.heroMediaUrl.split(",").filter(Boolean)
+      : []
+  );
+
+  const handleAddHeroVideo = (url: string) => {
+    const updated = [...heroVideos, url];
+    setHeroVideos(updated);
+    setHeroMediaUrl(updated.join(","));
+  };
+
+  const handleRemoveHeroVideo = (index: number) => {
+    const updated = heroVideos.filter((_, idx) => idx !== index);
+    setHeroVideos(updated);
+    setHeroMediaUrl(updated.join(","));
+  };
+
   // Section Visibilities
   const [showStats, setShowStats] = useState(home.showStats);
   const [showAboutPreview, setShowAboutPreview] = useState(home.showAboutPreview);
@@ -177,7 +195,14 @@ export function HomepageForm({ home }: Props) {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Media Type</Label>
-                <Select value={heroMediaType} onValueChange={setHeroMediaType}>
+                <Select value={heroMediaType} onValueChange={(val) => {
+                  setHeroMediaType(val);
+                  if (val === "IMAGE") {
+                    setHeroMediaUrl(heroVideos[0] || "");
+                  } else {
+                    setHeroMediaUrl(heroVideos.join(","));
+                  }
+                }}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -187,21 +212,55 @@ export function HomepageForm({ home }: Props) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>File Upload</Label>
-                <MediaUploader
-                  value={heroMediaUrl}
-                  accept={heroMediaType === "VIDEO" ? "video/*" : "image/*"}
-                  onChange={(url, id) => {
-                    setHeroMediaUrl(url);
-                    if (id) setHeroMediaPublicId(id);
-                  }}
-                  onClear={() => {
-                    setHeroMediaUrl("");
-                    setHeroMediaPublicId("");
-                  }}
-                />
-              </div>
+
+              {heroMediaType === "VIDEO" ? (
+                <div className="space-y-4">
+                  <Label>Hero Videos</Label>
+                  <div className="space-y-2">
+                    {heroVideos.map((url, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-3 border rounded-lg bg-secondary/10">
+                        <video src={url} className="h-10 w-16 object-cover rounded bg-black" muted />
+                        <span className="text-xs truncate flex-1 font-mono text-muted-foreground">{url}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          onClick={() => handleRemoveHeroVideo(idx)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-2 pt-2 border-t">
+                    <Label className="text-xs text-muted-foreground">Add another video</Label>
+                    <MediaUploader
+                      value=""
+                      accept="video/*"
+                      onChange={(url) => {
+                        if (url) handleAddHeroVideo(url);
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label>File Upload</Label>
+                  <MediaUploader
+                    value={heroMediaUrl}
+                    accept="image/*"
+                    onChange={(url, id) => {
+                      setHeroMediaUrl(url);
+                      if (id) setHeroMediaPublicId(id);
+                    }}
+                    onClear={() => {
+                      setHeroMediaUrl("");
+                      setHeroMediaPublicId("");
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

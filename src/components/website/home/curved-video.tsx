@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Volume2, VolumeX, Play, Pause } from "lucide-react";
+import { Volume2, VolumeX, Play, Pause, ChevronLeft, ChevronRight } from "lucide-react";
 
 type CurvedVideoProps = {
   videoUrl?: string;
@@ -18,6 +18,26 @@ export function CurvedVideo({ videoUrl = DEFAULT_VIDEO }: CurvedVideoProps) {
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+
+  const videoUrls = videoUrl.split(",").filter(Boolean);
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+  const currentVideoUrl = videoUrls[activeVideoIndex] || DEFAULT_VIDEO;
+
+  // Load and play when active video index changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      if (isPlaying) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  }, [activeVideoIndex]);
+
+  const handleVideoEnded = () => {
+    if (videoUrls.length > 1) {
+      setActiveVideoIndex((prev) => (prev + 1) % videoUrls.length);
+    }
+  };
 
   // Auto-pause video when scrolled out of viewport to conserve CPU/GPU
   useEffect(() => {
@@ -109,14 +129,15 @@ export function CurvedVideo({ videoUrl = DEFAULT_VIDEO }: CurvedVideoProps) {
         <div className="relative w-full h-full overflow-hidden">
           <video
             ref={videoRef}
-            src={videoUrl}
+            src={currentVideoUrl}
             autoPlay
             muted
-            loop
+            loop={videoUrls.length <= 1}
             playsInline
             preload="metadata"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
+            onEnded={handleVideoEnded}
             className="w-full h-full object-cover scale-100 transition-transform duration-[1200ms] cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-[1.04]"
           />
         </div>
@@ -144,10 +165,10 @@ export function CurvedVideo({ videoUrl = DEFAULT_VIDEO }: CurvedVideoProps) {
         <div className="absolute bottom-6 left-6 right-6 md:bottom-8 md:left-8 md:right-8 z-10 flex items-end justify-between">
           <div className="flex flex-col gap-1.5 pointer-events-none text-left">
             <span className="text-[10px] tracking-[0.25em] font-bold text-[#B79D89] font-label uppercase">
-              01 / SIGNATURE PORTFOLIO
+              {videoUrls.length > 1 ? `SHOWREEL VIDEO ${activeVideoIndex + 1} OF ${videoUrls.length}` : "01 / SIGNATURE PORTFOLIO"}
             </span>
             <h3 className="font-heading text-lg sm:text-2xl font-light text-white tracking-wide leading-none">
-              Masco Grandeur
+              {videoUrls.length > 1 ? `Presentation ${activeVideoIndex + 1}` : "Masco Grandeur"}
             </h3>
             <span className="text-[10px] text-white/50 font-mono mt-1">
               {formatTime(currentTime)} — {formatTime(duration)}
@@ -155,8 +176,36 @@ export function CurvedVideo({ videoUrl = DEFAULT_VIDEO }: CurvedVideoProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            {videoUrls.length > 1 && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveVideoIndex((prev) => (prev - 1 + videoUrls.length) % videoUrls.length);
+                  }}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 flex items-center justify-center text-white transition-all duration-300 hover:scale-105 shadow-md cursor-pointer"
+                  title="Previous video"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveVideoIndex((prev) => (prev + 1) % videoUrls.length);
+                  }}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 flex items-center justify-center text-white transition-all duration-300 hover:scale-105 shadow-md cursor-pointer"
+                  title="Next video"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             {/* Elegant Floating Mute Control */}
             <button
+              type="button"
               onClick={toggleMute}
               className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 flex items-center justify-center text-white transition-all duration-300 hover:scale-105 shadow-md cursor-pointer"
               aria-label={isMuted ? "Unmute video" : "Mute video"}

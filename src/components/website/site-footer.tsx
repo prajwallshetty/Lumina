@@ -105,13 +105,13 @@ export async function SiteFooter() {
             <div className="space-y-3 text-xs font-body text-white/70 leading-relaxed">
               <p>{settings?.addressLine ?? "Mangalore, Bengaluru & Kerala, India"}</p>
               <p>
-                <a href={`mailto:${settings?.email ?? "hello@luminaspaces.com"}`} className="hover:text-[#B79D89] transition-colors">
-                  {settings?.email ?? "hello@luminaspaces.com"}
+                <a href={`mailto:${settings?.email ?? "info@luminaspaces.com"}`} className="hover:text-[#B79D89] transition-colors">
+                  {settings?.email ?? "info@luminaspaces.com"}
                 </a>
               </p>
               <p>
-                <a href={`tel:${settings?.phone ?? "+919576543210"}`} className="hover:text-[#B79D89] transition-colors">
-                  {settings?.phone ?? "+91 95765 43210"}
+                <a href={`tel:${settings?.phone ?? "+919916221284"}`} className="hover:text-[#B79D89] transition-colors">
+                  {settings?.phone ?? "+91 99162 21284"}
                 </a>
               </p>
             </div>

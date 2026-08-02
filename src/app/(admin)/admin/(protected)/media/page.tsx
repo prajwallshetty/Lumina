@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Upload, ImagePlus } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
-import { MediaContainer } from "@/components/shared/media-container";
+import { MediaGrid } from "@/components/admin/media-grid";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 
@@ -48,19 +48,7 @@ export default async function AdminMediaPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {media.map((m) => (
-            <MediaContainer
-              key={m.id}
-              src={m.secureUrl}
-              alt={m.alt}
-              label={m.type}
-              kind={m.type === "VIDEO" ? "video" : "image"}
-              aspect="aspect-square"
-              rounded="rounded-lg"
-            />
-          ))}
-        </div>
+        <MediaGrid initialMedia={media} />
       )}
     </div>
   );
