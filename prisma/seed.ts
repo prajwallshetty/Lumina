@@ -313,58 +313,105 @@ async function seedBeforeAfter() {
 
 const SEED_TESTIMONIALS = [
   {
-    clientName: "V&RO Hospitality",
-    company: "V&RO Hospitality Group",
+    clientName: "Badmaash",
+    company: "Badmaash",
     rating: 5,
-    quote: "Lumina Spaces delivered our hospitality interiors with outstanding quality and professionalism. The execution exceeded our expectations, and every detail reflected exceptional craftsmanship.",
+    quote: "The vibrant aesthetics and structural execution of our restaurant were delivered with perfection. Lumina Spaces understood our brand language flawlessly.",
     order: 1,
   },
   {
-    clientName: "Table Space Private Limited",
-    company: "Table Space",
+    clientName: "Plan B",
+    company: "Plan B",
     rating: 5,
-    quote: "Their project execution was seamless from planning to completion. The team maintained excellent communication and delivered everything on time.",
+    quote: "An outstanding team that transformed our outlet with modern industrial aesthetics. The craftsmanship and attention to detail are spectacular.",
     order: 2,
   },
   {
-    clientName: "Cafe Noir",
-    company: "Cafe Noir",
+    clientName: "Sultanate of Shawarma",
+    company: "Sultanate of Shawarma",
     rating: 5,
-    quote: "An exceptional experience working with Lumina Spaces. Their creativity, attention to detail and execution quality truly transformed our space.",
+    quote: "Lumina Spaces designed and executed our food outlet with high functionality and premium finishes. Professional and prompt delivery.",
     order: 3,
   },
   {
-    clientName: "Compass Logistics",
-    company: "Compass Logistics",
+    clientName: "Novakan",
+    company: "Novakan",
     rating: 5,
-    quote: "Professional, transparent and highly reliable. Every milestone was delivered exactly as committed.",
+    quote: "Our new corporate workspace is both functional and beautifully crafted. Highly recommend Lumina for premium turnkey commercial interiors.",
     order: 4,
   },
   {
-    clientName: "Government of Karnataka",
-    company: "Government of Karnataka",
+    clientName: "Quarter Peter",
+    company: "Quarter Peter",
     rating: 5,
-    quote: "Lumina Spaces demonstrated excellent project management, quality workmanship and timely execution throughout the engagement.",
+    quote: "Excellent interior execution. The team handled everything from planning to handover with great diligence and craftsmanship.",
     order: 5,
+  },
+  {
+    clientName: "Hangover",
+    company: "Hangover",
+    rating: 5,
+    quote: "Created a stunning, lively atmosphere for our lounge. Their design solutions and turnkey execution are top-notch.",
+    order: 6,
+  },
+  {
+    clientName: "Tycoons",
+    company: "Tycoons",
+    rating: 5,
+    quote: "Delivered a luxurious, high-end design for our venue. Their execution team is highly skilled and professional.",
+    order: 7,
+  },
+  {
+    clientName: "Chai Kada",
+    company: "Chai Kada",
+    rating: 5,
+    quote: "A charming cafe ambiance built with organic textures and natural lighting. Extremely satisfied with their design approach.",
+    order: 8,
+  },
+  {
+    clientName: "Cleaniac India Pvt. Ltd.",
+    company: "Cleaniac India Pvt. Ltd.",
+    rating: 5,
+    quote: "Lumina executed our corporate office interiors with a sleek, minimalist design that boosts productivity and matches our brand.",
+    order: 9,
+  },
+  {
+    clientName: "KMT Equipment Rental (KSA)",
+    company: "KMT Equipment Rental (KSA)",
+    rating: 5,
+    quote: "Professional construction management and architectural planning for our facilities. Reliable partner for large-scale operations.",
+    order: 10,
+  },
+  {
+    clientName: "Amplitude Manpower Supplies (KSA)",
+    company: "Amplitude Manpower Supplies (KSA)",
+    rating: 5,
+    quote: "Outstanding design and build execution for our corporate office. The space feels extremely professional and premium.",
+    order: 11,
+  },
+  {
+    clientName: "Apsara Group",
+    company: "Apsara Group",
+    rating: 5,
+    quote: "Turnkey retail interior execution delivered to the highest standards. Their team possesses great design sensibility.",
+    order: 12,
   },
 ];
 
 async function seedTestimonials() {
+  await prisma.testimonial.deleteMany({});
   for (const item of SEED_TESTIMONIALS) {
-    const existing = await prisma.testimonial.findFirst({ where: { clientName: item.clientName } });
-    if (!existing) {
-      await prisma.testimonial.create({
-        data: {
-          clientName: item.clientName,
-          company: item.company,
-          rating: item.rating,
-          quote: item.quote,
-          order: item.order,
-          isFeatured: true,
-          isPublished: true,
-        },
-      });
-    }
+    await prisma.testimonial.create({
+      data: {
+        clientName: item.clientName,
+        company: item.company,
+        rating: item.rating,
+        quote: item.quote,
+        order: item.order,
+        isFeatured: true,
+        isPublished: true,
+      },
+    });
   }
 }
 

@@ -103,7 +103,7 @@ export async function SiteFooter() {
               STUDIO ENQUIRIES
             </h4>
             <div className="space-y-3 text-xs font-body text-white/70 leading-relaxed">
-              <p>{settings?.addressLine ?? "Bengaluru & Goa, India"}</p>
+              <p>{settings?.addressLine ?? "Mangalore, Bengaluru & Kerala, India"}</p>
               <p>
                 <a href={`mailto:${settings?.email ?? "hello@luminaspaces.com"}`} className="hover:text-[#B79D89] transition-colors">
                   {settings?.email ?? "hello@luminaspaces.com"}

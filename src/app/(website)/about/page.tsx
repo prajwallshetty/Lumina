@@ -132,48 +132,6 @@ export default async function AboutPage() {
           )}
         </div>
       </Section>
-
-      {/* Founder Section */}
-      {content.founderName && (
-        <Section className="py-24 border-t border-border/40 bg-secondary/15 relative overflow-hidden">
-          <div className="grid gap-12 lg:grid-cols-12 items-center">
-            {content.founderPhotoUrl && (
-              <div className="lg:col-span-5">
-                <Reveal>
-                  <div className="overflow-hidden rounded-2xl border border-border/80 shadow-md">
-                    <MediaContainer
-                      src={content.founderPhotoUrl}
-                      label="Founder portrait"
-                      aspect="aspect-[4/5]"
-                    />
-                  </div>
-                </Reveal>
-              </div>
-            )}
-            <div className="lg:col-span-7 space-y-6">
-              <span className="text-[10px] tracking-[0.25em] font-semibold text-accent uppercase block">
-                MEET THE FOUNDER
-              </span>
-              <div className="relative">
-                <Quote className="absolute -top-6 -left-6 h-10 w-10 text-accent/15 pointer-events-none" strokeWidth={1} />
-                <h3 className="font-heading text-3xl sm:text-4xl font-light text-foreground tracking-tight leading-tight">
-                  {content.founderName}
-                </h3>
-                {content.founderRole && (
-                  <p className="text-xs text-accent font-semibold tracking-wider uppercase mt-1">
-                    {content.founderRole}
-                  </p>
-                )}
-              </div>
-              {content.founderMessage && (
-                <p className="font-body text-base sm:text-lg italic font-light text-muted-foreground leading-relaxed whitespace-pre-line pt-2">
-                  &ldquo;{content.founderMessage}&rdquo;
-                </p>
-              )}
-            </div>
-          </div>
-        </Section>
-      )}
     </>
   );
 }

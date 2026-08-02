@@ -28,9 +28,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 const META_FIELDS = [
   ["Client", "client"],
   ["Location", "location"],
-  ["Budget", "budget"],
-  ["Timeline", "timeline"],
-  ["Area", "area"],
   ["Year", "year"],
   ["Completion Date", "completionDate"],
 ] as const;
